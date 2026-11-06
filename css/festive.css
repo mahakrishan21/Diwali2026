@@ -1,0 +1,169 @@
+/* E2M Diwali — Revision 6 "festive layer": bilingual zone eyebrows, varied header compositions, folk-art motifs,
+   garland / rangoli / diya-row seams, brass-bell HUD, Devanagari stamps. Tiles live in festive-tiles.css (generated). */
+
+/* ============ Zone header: bilingual eyebrow + three compositions ============ */
+.zh-kicker {
+  display: inline-flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .5em .8em;
+  font: 400 var(--fs-eyebrow)/1.3 var(--font-accent); letter-spacing: .01em; text-transform: none; color: var(--marigold-text);
+}
+.zh-roman {
+  display: inline-grid; place-items: center; flex: none; width: 2.05em; height: 2.05em; padding: 0 .1em;
+  font: 400 .8em/1 var(--font-accent); letter-spacing: 0; color: var(--rice);
+  background: radial-gradient(circle at 42% 34%, #E0283F, var(--kumkum) 58%, var(--kumkum-deep));
+  border-radius: 50%; box-shadow: 0 0 0 2px rgba(5, 7, 15, .9), 0 0 0 3.5px var(--brass), 0 4px 12px rgba(0, 0, 0, .5);
+  text-shadow: 0 1px 0 rgba(60, 0, 10, .6);
+}
+.zh-deva { font-family: var(--font-accent); font-size: 1.12em; color: var(--marigold-text); }
+.zh-sep { color: var(--brass); opacity: .8; }
+.zh-eng { font: 600 var(--fs-ui)/1.3 var(--font-body); letter-spacing: .01em; color: var(--ivory); opacity: .92; }
+.zh-rule { display: none; }
+.zh-title {
+  font-weight: 400; max-width: 16ch; margin-top: clamp(1.1rem, 2vw, 1.7rem);
+  font-size: clamp(3.1rem, 1.7rem + 5.6vw, 7.2rem); line-height: .98;
+}
+.zh-title em { font-weight: 400; font-style: italic; color: var(--marigold-text); }
+.zh-line {
+  max-width: 34rem; margin-top: clamp(1.2rem, 2vw, 1.7rem);
+  font: 400 var(--fs-body)/var(--lh-body) var(--font-body); letter-spacing: 0; color: var(--ink);
+}
+.zh-hint {
+  font: 500 var(--fs-hint)/1.6 var(--font-body); letter-spacing: 0; text-transform: none; color: var(--ivory-80);
+  max-width: 42rem;
+}
+.zh-hint-mark { width: 9px; height: 9px; transform: none; border: 0; border-radius: 50%; background: radial-gradient(circle at 40% 38%, #F0324A, var(--kumkum) 60%, var(--kumkum-deep)); box-shadow: 0 0 0 1.5px rgba(217, 164, 65, .85); }
+@media (max-width: 760px) {
+  .zh-title { font-size: clamp(2.8rem, 12vw, 3.8rem); }
+  .zh-line { font-size: var(--fs-body); }
+  .zh-hint { letter-spacing: 0; max-width: 24rem; }
+  .zh-hint-mark { display: inline-block; }
+}
+/* composition: centred (default) · left-hung · right-hung */
+@media (min-width: 900px) {
+  .zh--left, .zh--right { max-width: 1240px; }
+  .zh--left { text-align: left; }
+  .zh--right { text-align: right; }
+  .zh--left .zh-kicker { justify-content: flex-start; }
+  .zh--right .zh-kicker { justify-content: flex-end; }
+  .zh--left .zh-title { margin-left: 0; }
+  .zh--right .zh-title { margin-right: 0; }
+  .zh--left .zh-line, .zh--left .zh-hint { margin-left: 0; }
+  .zh--right .zh-line, .zh--right .zh-hint { margin-right: 0; }
+  .zh--left .zh-hint { justify-content: flex-start; }
+  .zh--right .zh-hint { justify-content: flex-end; }
+  .zh--left::before { left: 38%; }
+  .zh--right::before { left: 62%; }
+}
+html.is-contrast .zh-eng { opacity: 1; }
+
+/* ============ Folk-art motifs (Warli / Madhubani line art), faint, one per header ============ */
+.zh-folk {
+  position: absolute; z-index: -1; pointer-events: none; width: clamp(120px, 17vw, 240px); aspect-ratio: 1; top: 2%;
+  background: var(--marigold); opacity: .09;
+  -webkit-mask: var(--folk) center / contain no-repeat; mask: var(--folk) center / contain no-repeat;
+}
+.zh-folk--fish { --folk: var(--folk-fish); } .zh-folk--sun { --folk: var(--folk-sun); } .zh-folk--peacock { --folk: var(--folk-peacock); }
+.zh-folk--lotus { --folk: var(--folk-lotus); } .zh-folk--paisley { --folk: var(--folk-paisley); } .zh-folk--warli { --folk: var(--folk-warli); }
+.zh-folk { right: 4%; }
+.zh--left .zh-folk { right: 3%; left: auto; }
+.zh--right .zh-folk { left: 3%; right: auto; transform: scaleX(-1); }
+.zh--right .zh-folk--warli, .zh--left .zh-folk--warli { aspect-ratio: 1; }
+@media (max-width: 899px) { .zh-folk { width: 110px; top: -2%; opacity: .07; } }
+
+/* ============ Seams: garland, rangoli border, row of diyas — set in the overlap between zones ============ */
+.seam { position: relative; z-index: 3; height: 0; pointer-events: none; }
+.seam::before {
+  content: ""; position: absolute; left: 50%; width: min(100%, 1500px); transform: translateX(-50%);
+  background-repeat: repeat-x; background-position: center top;
+  -webkit-mask: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent); mask: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+}
+.seam--toran::before { top: clamp(1.2rem, 2.6vw, 2.8rem); height: 84px; background-image: var(--tile-toran); background-size: 120px 84px; opacity: .8; transform-origin: 50% 0; animation: seam-sway 9s ease-in-out infinite alternate; }
+.seam--rangoli::before { top: clamp(2rem, 3.6vw, 3.6rem); height: 30px; background-image: var(--tile-rangoli); background-size: 64px 30px; opacity: .72; }
+.seam--diyas::before { top: clamp(1.6rem, 3vw, 3rem); height: 44px; background-image: var(--tile-diyas); background-size: 76px 44px; opacity: .85; }
+/* flame glow pulse over the diya row (opacity only) */
+.seam--diyas::after {
+  content: ""; position: absolute; left: 50%; width: min(100%, 1500px); transform: translateX(-50%); top: clamp(.9rem, 2.3vw, 2.3rem); height: 44px;
+  background: radial-gradient(circle 15px at 38px 15px, rgba(255, 180, 70, .5), transparent 70%) 0 0 / 76px 44px repeat-x;
+  -webkit-mask: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent); mask: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  animation: seam-glow 2.6s ease-in-out infinite alternate;
+}
+@keyframes seam-sway { 0% { transform: translateX(-50%) rotate(-.12deg); } 100% { transform: translateX(-50%) rotate(.12deg); } }
+@keyframes seam-glow { 0% { opacity: .55; } 100% { opacity: 1; } }
+html.is-calm .seam::before, html.is-calm .seam::after, html.is-paused .seam::before, html.is-paused .seam::after { animation: none; }
+@media (max-width: 760px) { .seam::before { width: 100%; } .seam--toran::before { height: 84px; } }
+@media (prefers-reduced-motion: reduce) { .seam::before, .seam::after { animation: none; } }
+
+/* ============ HUD: brass-bell sound, diya tools, larger labels ============ */
+.dot-label { font: 600 var(--fs-label)/1 var(--font-body); letter-spacing: .02em; text-transform: none; color: var(--ivory); padding: .55rem .85rem; }
+.dot-label b { font: 400 1em/1 var(--font-accent); color: var(--marigold-text); letter-spacing: .02em; margin-right: .55em; }
+.hud-map { font: 600 var(--fs-ui)/1 var(--font-body); letter-spacing: .01em; text-transform: none; color: var(--ivory); }
+.hud-found { font: 400 var(--fs-ui)/1 var(--font-accent); letter-spacing: .02em; color: var(--marigold-text); }
+.hud-found-num { font-size: 1.1em; }
+.hud-sound, .hud-tools {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: .55rem;
+  min-height: 44px; min-width: 44px; padding: 0 .95rem 0 .75rem; margin: 0;
+  border: 0; border-radius: 22px;
+  background: linear-gradient(180deg, rgba(42, 26, 64, .86), rgba(14, 12, 40, .86));
+  box-shadow: inset 0 0 0 1.5px rgba(217, 164, 65, .55), 0 6px 14px -8px rgba(0, 0, 0, .8);
+  color: var(--ivory);
+  font: 600 var(--fs-ui)/1 var(--font-body); letter-spacing: .01em; text-transform: none;
+  transition: color .4s var(--ease-lux), box-shadow .45s var(--ease-lux), background .4s var(--ease-lux);
+}
+.hud-sound svg, .hud-tools svg { width: 20px; height: 24px; flex: none; color: var(--brass); overflow: visible; transition: color .4s var(--ease-lux); }
+.hud-tools svg { width: 28px; height: 18px; }
+.hud-sound:hover, .hud-tools:hover, .hud-tools[aria-expanded="true"], .hud-sound.is-on { color: var(--ivory); box-shadow: inset 0 0 0 1.5px var(--brass), 0 0 16px -2px rgba(255, 170, 60, .4), 0 6px 14px -8px rgba(0, 0, 0, .8); }
+.hud-sound:hover svg, .hud-tools:hover svg, .hud-sound.is-on svg, .hud-tools[aria-expanded="true"] svg { color: var(--brass-hi); }
+.hud-sound svg, .op-sound svg { transform-origin: 50% 4%; }
+.hud-sound.is-on svg, .op-sound.is-on svg { animation: bell-ring 3.6s ease-in-out infinite; }
+.hud-sound:hover svg, .op-sound:hover svg { animation: bell-ring 1.2s ease-in-out 1; }
+@keyframes bell-ring { 0%, 100% { transform: rotate(0); } 6% { transform: rotate(14deg); } 14% { transform: rotate(-11deg); } 22% { transform: rotate(7deg); } 30% { transform: rotate(-4deg); } 40% { transform: rotate(0); } }
+/* a tiny flame appears over the diya icon when Tools is open or hovered */
+.hud-tools::after {
+  content: ""; position: absolute; left: calc(.75rem + 12px); top: 5px; width: 6px; height: 9px;
+  border-radius: 50% 50% 45% 45% / 64% 64% 36% 36%;
+  background: radial-gradient(ellipse at 50% 76%, #fff 0 14%, #FFD778 46%, #FF9F32 86%);
+  box-shadow: 0 0 8px 2px rgba(255, 170, 60, .6);
+  opacity: 0; transform: scaleY(.3); transform-origin: 50% 100%; transition: opacity .3s, transform .45s var(--ease-back);
+}
+.hud-tools:hover::after, .hud-tools:focus-visible::after, .hud-tools[aria-expanded="true"]::after { opacity: 1; transform: scaleY(1); }
+html.is-calm .hud-sound svg, html.is-calm .op-sound svg { animation: none !important; }
+@media (max-width: 899px) { .hud-sound, .hud-tools { padding: 0 .7rem; } .hud-sound-label, .hud-tools-label { display: none; } }
+
+/* ============ Opening / finale: Devanagari stamps, bigger copy ============ */
+.op-eyebrow { font: 600 var(--fs-ui)/1.3 var(--font-body); letter-spacing: .08em; }
+.op-deva { margin-top: clamp(.9rem, 2.2vh, 1.4rem); }
+.op-deva .deva-stamp { font-size: clamp(1.35rem, 1.1rem + .8vw, 1.9rem); padding: .3em .95em .22em; color: var(--marigold-text); }
+.op-copy { font-size: var(--fs-body); line-height: var(--lh-body); color: var(--ink); max-width: 32rem; }
+.op-cta { min-width: 0; background: none; box-shadow: none; }
+.op-sound {
+  gap: .6rem; padding: 0 1rem; font: 600 var(--fs-ui)/1 var(--font-body); letter-spacing: .01em; text-transform: none; color: var(--ivory);
+}
+.op-sound svg { width: 20px; height: 24px; color: var(--brass); }
+.fn-go { box-shadow: none; font-size: var(--fs-btn); white-space: normal; max-width: min(calc(100vw - 40px), 30rem); }
+/* fn-replay now uses .btn-plain */
+.fn-stamps { display: flex; gap: .8rem; justify-content: center; margin-top: clamp(.8rem, 2vh, 1.3rem); }
+.fn-stamps .deva-stamp { font-size: clamp(1.3rem, 1.1rem + .6vw, 1.7rem); }
+.fn-kicker { font: 600 var(--fs-ui)/1.3 var(--font-body); }
+.fn-thanks { font-size: clamp(1.3rem, 1.1rem + .7vw, 1.7rem); font-weight: 400; }
+.fn-score { font: 500 var(--fs-hint)/1.55 var(--font-body); color: var(--ivory-80); }
+.scroll-cue { font: 600 var(--fs-label)/1 var(--font-body); letter-spacing: .08em; }
+.foot-small { font-size: var(--fs-ui); color: var(--ivory-80); }
+.foot-line { font-weight: 400; }
+@media (max-width: 600px) { .op-eyebrow { font-size: var(--fs-label); letter-spacing: .08em; } }
+
+/* ============ Phuljhadi cursor trail canvas (core.js) ============ */
+#e2m-sparkler { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: var(--z-fx); }
+
+/* R8: plain, simple button (no garland, no flame) — same look as the Sound / Tools pills */
+.btn-plain {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  min-height: 48px; min-width: 48px; padding: 0 1.5rem; margin: 0;
+  border: 0; border-radius: 24px; cursor: pointer;
+  background: linear-gradient(180deg, rgba(42, 26, 64, .9), rgba(14, 12, 40, .9));
+  box-shadow: inset 0 0 0 1.5px rgba(217, 164, 65, .6), 0 6px 14px -8px rgba(0, 0, 0, .8);
+  color: var(--ivory);
+  font: 600 var(--fs-btn, 17px)/1 var(--font-body); letter-spacing: .01em; text-transform: none;
+  transition: color .3s var(--ease-lux), box-shadow .35s var(--ease-lux), background .3s var(--ease-lux);
+}
+.btn-plain:hover { color: #fff; background: linear-gradient(180deg, rgba(58, 38, 86, .95), rgba(22, 18, 58, .95)); box-shadow: inset 0 0 0 1.5px rgba(255, 215, 120, .9), 0 8px 18px -8px rgba(0, 0, 0, .85); }
+.btn-plain:active { transform: translateY(1px); }
+.btn-plain:focus-visible { outline: var(--focus-ring, 2px solid #FFD778); outline-offset: 3px; }

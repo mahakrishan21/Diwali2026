@@ -1,0 +1,7 @@
+{
+  "name": "e2m-diwali",
+  "private": true,
+  "scripts": {
+    "dev": "python3 e2m-diwali-server.py"
+  }
+}

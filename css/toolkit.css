@@ -1,0 +1,188 @@
+/* E2M Diwali — Toolkit (Revision 2). Hairline-gold drawer; tracked caps; no rounded cards. */
+
+/* HUD button: styled in festive.css (brass-bell / diya chips) */
+.hud-tools.has-alert::after { content: ""; position: absolute; top: 6px; right: 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--kumkum); box-shadow: 0 0 0 1.5px var(--brass); opacity: 1; transform: none; left: auto; }
+@media (max-width: 420px) { .hud-tools-label { display: none; } }
+
+/* Scrim + drawer */
+.tk-scrim {
+  position: fixed; inset: 0; z-index: 79; background: rgba(2, 2, 10, .55);
+  opacity: 0; transition: opacity .45s var(--ease-lux);
+}
+.tk-scrim.is-open { opacity: 1; }
+.tk {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 80;
+  width: min(420px, 100vw);
+  display: flex; pointer-events: none;
+}
+.tk[hidden] { display: none; }
+.tk-panel {
+  pointer-events: auto; position: relative; display: flex; flex-direction: column; width: 100%; height: 100%;
+  background: linear-gradient(180deg, rgba(8, 9, 28, .985), rgba(5, 5, 18, .99));
+  border-left: var(--hair-w) solid var(--gold-hair-soft);
+  box-shadow: -40px 0 80px rgba(0, 0, 0, .45);
+  transform: translateX(28px); opacity: 0;
+  transition: transform .55s var(--ease-out), opacity .45s var(--ease-lux);
+  padding-top: var(--safe-top); padding-right: var(--safe-right); padding-bottom: var(--safe-bottom);
+}
+.tk.is-open .tk-panel { transform: none; opacity: 1; }
+.tk-head { position: relative; padding: 1.7rem 1.8rem 1.3rem; border-bottom: 1px solid var(--gold-hair-soft); }
+.tk-kicker { color: var(--gold-text); }
+.tk-title { margin-top: .5rem; font: 300 2.4rem/1 var(--font-display); letter-spacing: .14em; text-transform: uppercase; color: var(--ivory); }
+.tk-close {
+  position: absolute; top: calc(1.2rem + var(--safe-top) * 0); right: 1.1rem; width: 44px; height: 44px; display: grid; place-items: center;
+  border: 1px solid transparent; background: none; color: var(--ivory-80); transition: color .4s, border-color .4s;
+}
+.tk-close svg { width: 20px; height: 20px; }
+.tk-close:hover { color: var(--gold); border-color: var(--gold-hair-soft); }
+.tk-body { flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; padding: .4rem 1.8rem 2.4rem; scrollbar-width: thin; }
+.tk-sec { padding: 1.3rem 0 .4rem; border-bottom: 1px solid rgba(255, 215, 120, .1); }
+.tk-sec:last-child { border-bottom: 0; }
+.tk-h { margin-bottom: .5rem; font-size: var(--fs-micro); color: var(--gold-text); font-family: var(--font-ui); }
+
+.tk-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 52px; padding: .35rem 0; }
+.tk-row[hidden] { display: none; }
+.tk-row.is-muted .tk-label, .tk-row.is-muted .tk-switch { opacity: .55; }
+.tk-label { display: grid; gap: .2rem; font: 300 1rem/1.35 var(--font-ui); color: var(--ivory); letter-spacing: .01em; }
+.tk-label small { font-size: .82rem; line-height: 1.45; color: var(--ivory-72); }
+.tk-row--seg { flex-wrap: wrap; }
+
+/* Switch: a hairline track with a gold diamond knob */
+.tk-switch {
+  position: relative; flex: none; display: inline-flex; align-items: center; gap: .7rem;
+  min-height: 44px; padding: 0 0 0 .2rem; border: 0; background: none; color: var(--ivory-80);
+  font: 400 var(--fs-micro)/1 var(--font-ui); letter-spacing: .18em; text-transform: uppercase;
+}
+.tk-switch i {
+  position: relative; width: 46px; height: 22px; border: var(--hair-w) solid var(--gold-hair); transition: border-color .4s, background-color .4s;
+}
+.tk-switch i::after {
+  content: ""; position: absolute; top: 50%; left: 6px; width: 9px; height: 9px; margin-top: -4.5px;
+  background: var(--ivory-72); transform: rotate(45deg); transition: left .45s var(--ease-out), background-color .4s;
+}
+.tk-switch[aria-checked="true"] { color: var(--gold); }
+.tk-switch[aria-checked="true"] i { border-color: var(--gold); background: rgba(255, 215, 120, .1); }
+.tk-switch[aria-checked="true"] i::after { left: 30px; background: var(--gold); box-shadow: 0 0 8px rgba(255, 215, 120, .6); }
+.tk-sw-state { min-width: 2.2em; text-align: left; }
+
+/* Segmented radiogroup */
+.tk-seg { display: inline-flex; border: var(--hair-w) solid var(--gold-hair-soft); }
+.tk-seg button {
+  min-height: 44px; min-width: 44px; padding: 0 .95rem; border: 0; border-left: 1px solid var(--gold-hair-soft); background: none;
+  color: var(--ivory-80); font: 400 var(--fs-micro)/1 var(--font-ui); letter-spacing: .16em; text-transform: uppercase;
+  transition: color .4s, background-color .4s;
+}
+.tk-seg button:first-child { border-left: 0; }
+.tk-seg button:hover { color: var(--ivory); background: rgba(255, 215, 120, .06); }
+.tk-seg button[aria-checked="true"] { color: var(--navy); background: var(--gold); font-weight: 500; }
+.tk-seg button:focus-visible { outline-offset: 2px; position: relative; z-index: 1; }
+.tk-seg button:disabled { opacity: .4; cursor: not-allowed; }
+.tk-seg--text button { font: 300 1.05rem/1 var(--font-display); letter-spacing: .04em; text-transform: none; min-width: 52px; }
+
+/* Range */
+.tk-row--range { gap: 1.1rem; }
+.tk-range { flex: 1 1 auto; min-width: 0; height: 44px; background: none; accent-color: var(--gold); -webkit-appearance: none; appearance: none; cursor: pointer; }
+.tk-range::-webkit-slider-runnable-track { height: 1px; background: var(--gold-hair); }
+.tk-range::-moz-range-track { height: 1px; background: var(--gold-hair); }
+.tk-range::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; margin-top: -7px; background: var(--gold); transform: rotate(45deg); border: 0; }
+.tk-range::-moz-range-thumb { width: 12px; height: 12px; background: var(--gold); transform: rotate(45deg); border: 0; border-radius: 0; }
+.tk-out { min-width: 3.2em; text-align: right; font: 300 1.1rem/1 var(--font-display); font-variant-numeric: lining-nums tabular-nums; color: var(--gold); }
+
+/* Shortcuts list */
+.tk-keys { margin: .2rem 0 .8rem; padding: .6rem 0; border-top: 1px solid rgba(255, 215, 120, .1); }
+.tk-key { display: grid; grid-template-columns: 7.5rem 1fr; gap: .8rem; align-items: baseline; padding: .45rem 0; }
+.tk-key dt { margin: 0; }
+.tk-key dd { margin: 0; font-size: .92rem; line-height: 1.5; color: var(--ivory-80); }
+kbd {
+  display: inline-block; min-width: 1.9em; padding: .25em .55em; text-align: center;
+  border: 1px solid var(--gold-hair); color: var(--gold);
+  font: 400 .78rem/1.3 var(--font-ui); letter-spacing: .08em;
+}
+
+/* Reset confirm */
+.tk-confirm { margin: .2rem 0 1rem; padding: 1rem 1.1rem; border: 1px solid var(--gold-hair); }
+.tk-confirm p { font-size: .95rem; line-height: 1.55; color: var(--ivory); }
+.tk-confirm-acts { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .9rem; }
+.tk-confirm .btn-primary { min-height: 44px; padding: .75em 1.5em; font-size: var(--fs-micro); }
+
+/* Mobile: a bottom sheet within thumb reach */
+@media (max-width: 600px) {
+  .tk { top: auto; left: 0; width: 100vw; height: min(88vh, 760px); }
+  .tk-panel { border-left: 0; border-top: var(--hair-w) solid var(--gold-hair-soft); transform: translateY(32px); box-shadow: 0 -30px 60px rgba(0, 0, 0, .5); padding-left: var(--safe-left); }
+  .tk-head { padding: 1.3rem 1.3rem 1rem; }
+  .tk-title { font-size: 2rem; }
+  .tk-body { padding: .2rem 1.3rem 1.8rem; }
+  .tk-row--seg { align-items: flex-start; flex-direction: column; gap: .6rem; }
+  .tk-key { grid-template-columns: 6.2rem 1fr; }
+}
+
+/* Onboarding tip — a quiet hairline note under the Tools button, shown once */
+/* Revision 3: the first-visit tip is a small strip docked right under the Tools button — one line, two tiny
+   actions, gone after 7s, on scroll or on the first tap elsewhere — so it never covers a game's controls or
+   play area (it used to be a large card over the stage tops). */
+/* It lives INSIDE the HUD bar (positioned by toolkit.js between the brand / progress line and the Sound
+   button), so it never overlays page content at all. */
+.tk-coach {
+  position: absolute; z-index: 3; top: calc(var(--safe-top) + (var(--hud-h) - 44px) / 2);
+  display: flex; align-items: center; gap: 0; height: 44px; padding: 0 0 0 .9rem; overflow: hidden;
+  background: rgba(6, 7, 22, .97); border: 1px solid var(--gold-hair-soft);
+  opacity: 0; transform: translateX(8px); transition: opacity .7s var(--ease-lux), transform .8s var(--ease-out);
+}
+.tk-coach.is-in { opacity: 1; transform: none; }
+.tk-coach p { flex: 1 1 auto; min-width: 0; margin: 0; font-size: var(--fs-ui); line-height: 1.2; color: var(--ivory-80); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tk-coach b { font-weight: 400; color: var(--gold); }
+.tk-coach kbd { font: inherit; padding: 0 .3em; border: 1px solid var(--gold-hair-soft); }
+.tk-coach-open, .tk-coach-ok {
+  flex: none; min-width: 44px; min-height: 44px; padding: 0 .7rem; border: 0; background: none; color: var(--gold);
+  font: 400 var(--fs-label)/1 var(--font-ui); letter-spacing: .2em; text-transform: uppercase;
+}
+.tk-coach-ok { font-size: 1.1rem; letter-spacing: 0; color: var(--ivory-80); }
+.tk-coach-open:hover, .tk-coach-ok:hover { color: var(--ivory); }
+@media (max-width: 600px) { .tk-coach .tk-k { display: none; } .tk-coach-open { display: none; } .tk-coach { padding-left: .7rem; } }
+
+html.tk-open, html.tk-open body { overflow: hidden; }
+@media (prefers-reduced-motion: reduce) { .tk-panel, .tk-scrim, .tk-coach { transition: none; } }
+html.is-calm .tk-panel { transition-duration: .01s; }
+
+/* =====================================================================
+   Revision 6 — the drawer in Mukta / Yatra One, marigold-bead switches, brass-edged segments
+   ===================================================================== */
+.tk-kicker { font: 400 var(--fs-btn)/1.2 var(--font-accent); letter-spacing: .01em; text-transform: none; color: var(--marigold-text); }
+.tk-title { font: 400 2.7rem/1 var(--font-display); letter-spacing: 0; text-transform: none; }
+.tk-panel { border-left: 0; box-shadow: -40px 0 80px rgba(0, 0, 0, .45), inset 3px 0 0 rgba(217, 164, 65, .5); background-image: radial-gradient(circle, rgba(255, 181, 46, .35) 0 1.3px, transparent 1.9px), linear-gradient(180deg, rgba(8, 9, 28, .985), rgba(5, 5, 18, .99)); background-size: 6px 14px, auto; background-repeat: repeat-y, no-repeat; background-position: 4px 0, 0 0; }
+.tk-panel > * { background-clip: padding-box; }
+.tk-head, .tk-body { background: linear-gradient(180deg, rgba(8, 9, 28, .99), rgba(5, 5, 18, .99)); margin-left: 14px; }
+.tk-h { font: 400 var(--fs-btn)/1.3 var(--font-accent); letter-spacing: .01em; text-transform: none; color: var(--marigold-text); }
+.tk-label { font: 500 var(--fs-hint)/1.4 var(--font-body); color: var(--ivory); }
+.tk-label small { font-size: var(--fs-ui); line-height: 1.5; color: var(--ivory-80); }
+.tk-close { border-radius: 50%; }
+.tk-switch { font: 600 var(--fs-ui)/1 var(--font-body); letter-spacing: .01em; text-transform: none; color: var(--ivory-80); }
+.tk-switch i { width: 52px; height: 28px; border: 0; border-radius: 14px; background: rgba(5, 6, 20, .8); box-shadow: inset 0 0 0 1.5px rgba(217, 164, 65, .6); }
+.tk-switch i::after { left: 5px; width: 18px; height: 18px; margin-top: -9px; transform: none; border-radius: 50%; background: radial-gradient(circle at 40% 36%, #E0283F, #A8122A 60%, #6E0A1B); box-shadow: 0 0 0 1.5px rgba(217, 164, 65, .8); }
+.tk-switch[aria-checked="true"] { color: var(--haldi); }
+.tk-switch[aria-checked="true"] i { background: rgba(255, 181, 46, .18); box-shadow: inset 0 0 0 1.5px var(--marigold); }
+.tk-switch[aria-checked="true"] i::after { left: 29px; background: radial-gradient(circle, #A84806 0 20%, var(--haldi) 28% 50%, var(--marigold-deep) 62%); box-shadow: 0 0 0 1.5px rgba(255, 210, 74, .9), 0 0 10px 1px rgba(255, 170, 50, .65); }
+.tk-seg { gap: 4px; padding: 4px; border: 0; border-radius: 14px; background: rgba(5, 6, 20, .6); box-shadow: inset 0 0 0 1px rgba(255, 181, 46, .22); }
+.tk-seg button { border: 0; border-radius: 10px; font: 600 var(--fs-ui)/1 var(--font-body); letter-spacing: .01em; text-transform: none; color: var(--ivory-80); padding: 0 1rem; }
+.tk-seg button:hover { background: rgba(255, 181, 46, .08); }
+.tk-seg button[aria-checked="true"] { color: var(--haldi); background: rgba(255, 181, 46, .16); box-shadow: inset 0 0 0 1.5px rgba(255, 190, 85, .7); font-weight: 700; }
+.tk-seg--text button { font: 400 1.25rem/1 var(--font-display); }
+.tk-range { accent-color: var(--marigold); }
+.tk-range::-webkit-slider-runnable-track { height: 3px; background: rgba(255, 181, 46, .4); border-radius: 2px; }
+.tk-range::-moz-range-track { height: 3px; background: rgba(255, 181, 46, .4); border-radius: 2px; }
+.tk-range::-webkit-slider-thumb { width: 22px; height: 22px; margin-top: -9.5px; transform: none; border-radius: 50%; background: radial-gradient(circle, #A84806 0 20%, var(--haldi) 28% 50%, var(--marigold-deep) 62%); box-shadow: 0 0 0 1.5px rgba(255, 210, 74, .9); }
+.tk-range::-moz-range-thumb { width: 22px; height: 22px; transform: none; border-radius: 50%; background: radial-gradient(circle, #A84806 0 20%, var(--haldi) 28% 50%, var(--marigold-deep) 62%); box-shadow: 0 0 0 1.5px rgba(255, 210, 74, .9); }
+.tk-out { font: 400 1.4rem/1 var(--font-accent); color: var(--marigold-text); }
+.tk-key dd { font-size: var(--fs-ui); }
+kbd { font: 600 .9375rem/1.3 var(--font-body); letter-spacing: 0; border-radius: 4px; color: var(--haldi); border-color: rgba(217, 164, 65, .6); }
+.tk-confirm { border-radius: 10px; border-color: rgba(217, 164, 65, .5); }
+.tk-confirm p { font-size: var(--fs-hint); }
+.tk-confirm-acts { gap: 1.2rem; padding-top: 14px; }
+.tk-coach { border-radius: 22px; padding-left: 1.1rem; }
+.tk-coach-open { font: 600 var(--fs-ui)/1 var(--font-body); letter-spacing: .01em; text-transform: none; color: var(--marigold-text); }
+.tk-coach-ok { font-size: 1.3rem; }
+@media (max-width: 600px) { .tk-head, .tk-body { margin-left: 0; } .tk-panel { background-image: linear-gradient(180deg, rgba(8, 9, 28, .985), rgba(5, 5, 18, .99)); background-size: auto; } .tk-title { font-size: 2.2rem; } }
+
+/* Revision 7: the note shown under Motion when only the device asks for reduced motion */
+.tk-note { margin: -.2rem 0 .9rem; padding: .55rem .8rem .6rem; border-radius: 10px; font: 400 var(--fs-ui)/1.5 var(--font-body); color: var(--ivory-80); background: rgba(255, 181, 46, .07); box-shadow: inset 3px 0 0 rgba(255, 181, 46, .55); }
+.tk-note[hidden] { display: none; }

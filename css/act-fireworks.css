@@ -1,0 +1,335 @@
+/* Activity I — Fireworks Playground (scoped to .act-fireworks / .zone--fireworks).
+   Revision 1: the sky is the focus; one quiet deck. Revision 3: the whole zone is the launch surface, the sky is a
+   full-screen layer, a hold-to-charge meter follows the pointer, a device-aware guide teaches the gestures. */
+
+/* the whole zone is the surface: crosshair, no text selection or long-press callout, vertical scroll still works */
+.zone--fireworks { cursor: crosshair; touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.zone--fireworks .fw-deck, .zone--fireworks button, .zone--fireworks a { cursor: pointer; }
+.zone--fireworks .fw-deck { cursor: default; }
+
+.act-fireworks { position: relative; }
+.act-fireworks .fw-sky {
+  position: relative; height: clamp(460px, 76vh, 880px); overflow: hidden;
+  outline-offset: -8px;
+  background: radial-gradient(80% 50% at 50% 100%, rgba(18, 16, 58, .42), transparent 70%);
+}
+/* Revision 2: the sky itself lights up in the burst's colour, behind the silhouettes */
+.act-fireworks .fw-skyglow {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0;
+  background: radial-gradient(58% 62% at var(--gx, 50%) var(--gy, 40%), var(--gc, #FFD778), transparent 70%);
+  -webkit-mask: linear-gradient(180deg, transparent, #000 22%, #000 88%, transparent); mask: linear-gradient(180deg, transparent, #000 22%, #000 88%, transparent);
+  mix-blend-mode: screen; filter: saturate(.75);
+}
+html.is-contrast .act-fireworks .fw-skyglow { display: none; }
+.act-fireworks .fw-rim {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 70%; z-index: 4; pointer-events: none; opacity: 0;
+  background: radial-gradient(42% 46% at var(--fx, 50%) 58%, var(--fc, #FFD778), transparent 72%);
+  -webkit-mask: linear-gradient(180deg, transparent, #000 30%, #000 82%, transparent); mask: linear-gradient(180deg, transparent, #000 30%, #000 82%, transparent);
+  mix-blend-mode: soft-light;
+}
+/* the temple town is generated to the box's real aspect (js), anchored to the floor, a little wider than the
+   viewport so an impact "thump" never exposes an edge, and its base dissolves into the ground */
+.act-fireworks .fw-skyline {
+  position: absolute; left: -28px; right: -28px; bottom: 0; height: clamp(170px, 40%, 360px); z-index: 3; pointer-events: none;
+  -webkit-mask: linear-gradient(180deg, #000 80%, rgba(0, 0, 0, .55) 93%, transparent); mask: linear-gradient(180deg, #000 80%, rgba(0, 0, 0, .55) 93%, transparent);
+}
+.act-fireworks .fw-skyline svg { position: absolute; left: 0; bottom: 0; width: 100%; height: 100%; overflow: visible; }
+.act-fireworks .fw-wins { transition: opacity 1.2s var(--ease-lux); }
+.act-fireworks.is-crazy .fw-wins-flare { opacity: .5; transition: opacity 1.4s var(--ease-lux); }
+.act-fireworks .fw-sky::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 10%; z-index: 3; pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(5, 7, 15, .66));
+}
+
+/* ---------- the guide: an animated mouse / finger that presses and holds, three short lines ---------- */
+.act-fireworks .fw-guide {
+  position: absolute; left: 50%; top: 34%; z-index: 5; transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center; gap: .5rem;
+  width: min(92vw, 30rem); padding: 1.6rem 1.4rem 1.5rem; pointer-events: none; text-align: center;
+  background: radial-gradient(closest-side, rgba(4, 4, 16, .72), rgba(4, 4, 16, .4) 62%, rgba(4, 4, 16, 0));
+  transition: opacity 1.6s var(--ease-lux), transform 1.8s var(--ease-out);
+}
+.act-fireworks .fw-guide.is-gone { opacity: 0; transform: translate(-50%, -62%); }
+.act-fireworks .fw-guide p { margin: 0; font: 400 var(--fs-label)/1.5 var(--font-ui); letter-spacing: .2em; text-transform: uppercase; color: var(--ivory-80); }
+.act-fireworks .fw-guide .fw-guide-l1 { color: var(--ivory); font-size: .82rem; letter-spacing: .24em; }
+.act-fireworks .fw-guide .fw-guide-l2, .act-fireworks .fw-guide .fw-guide-l3 { color: var(--ivory-72); }
+.act-fireworks .fw-guide-icon { position: relative; width: 48px; height: 66px; margin-bottom: .5rem; color: var(--gold); animation: fw-gi-press 3.2s var(--ease-io) infinite; }
+.act-fireworks .fw-guide-icon svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.act-fireworks .fw-gi-btn { animation: fw-gi-btn 3.2s var(--ease-io) infinite; }
+.act-fireworks .fw-gi-ring {
+  position: absolute; left: 50%; top: 22%; width: 52px; height: 52px; margin: -26px 0 0 -26px; border-radius: 50%;
+  border: 1px solid var(--gold); opacity: 0; animation: fw-gi-ring 3.2s var(--ease-out) infinite;
+}
+.act-fireworks .fw-gi-hand .fw-gi-ring, html.is-touch .act-fireworks .fw-gi-ring { top: 14%; }
+@keyframes fw-gi-press { 0%, 12% { transform: translateY(0) scale(1); } 20%, 58% { transform: translateY(3px) scale(.95); } 66%, 100% { transform: translateY(0) scale(1); } }
+@keyframes fw-gi-btn { 0%, 14% { opacity: 0; } 20%, 58% { opacity: .55; } 64%, 100% { opacity: 0; } }
+@keyframes fw-gi-ring { 0%, 18% { opacity: 0; transform: scale(.3); } 22% { opacity: .9; transform: scale(.35); } 58% { opacity: .7; transform: scale(1.05); } 70% { opacity: 0; transform: scale(1.5); } 100% { opacity: 0; } }
+html.is-calm .act-fireworks .fw-guide-icon, html.is-calm .act-fireworks .fw-gi-ring, html.is-calm .act-fireworks .fw-gi-btn { animation: none; }
+html.is-calm .act-fireworks .fw-gi-ring { opacity: .5; transform: scale(.8); }
+
+/* ---------- the charge meter (fixed, on the zone; follows the pointer) ---------- */
+.fw-charge {
+  position: fixed; left: 0; top: 0; z-index: 4; width: 0; height: 0; pointer-events: none;
+  opacity: 0; transition: opacity .25s var(--ease-lux);
+}
+.fw-charge.is-on { opacity: 1; }
+.fw-ch-ring {
+  position: absolute; left: -32px; top: -32px; width: 64px; height: 64px; border-radius: 50%;
+  background: conic-gradient(var(--gold) calc(var(--p, 0) * 1turn), rgba(255, 244, 220, .2) 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px)); mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+  filter: drop-shadow(0 0 6px rgba(255, 215, 120, .65));
+}
+.fw-ch-core { position: absolute; left: -4px; top: -4px; width: 8px; height: 8px; border-radius: 50%; background: #FFF4DC; box-shadow: 0 0 12px 3px rgba(255, 215, 120, .6); }
+.fw-charge.is-full .fw-ch-ring { background: conic-gradient(#FFF4DC 1turn, transparent 0); }
+.fw-charge.is-grand .fw-ch-ring { background: conic-gradient(#FF9F32 1turn, transparent 0); filter: drop-shadow(0 0 12px rgba(255, 159, 50, .95)); animation: fw-ch-pulse .5s ease-in-out infinite alternate; }
+@keyframes fw-ch-pulse { from { transform: scale(1); } to { transform: scale(1.16); } }
+html.is-calm .fw-charge.is-grand .fw-ch-ring { animation: none; }
+.fw-ch-beam {
+  position: absolute; left: -.5px; bottom: 0; width: 1px; height: 0; opacity: 0;
+  background: repeating-linear-gradient(0deg, var(--gold) 0 4px, transparent 4px 9px);
+  -webkit-mask: linear-gradient(0deg, transparent 0 34px, #000 60px); mask: linear-gradient(0deg, transparent 0 34px, #000 60px);
+}
+.fw-ch-beam::before { content: ""; position: absolute; left: -4px; top: -4px; width: 9px; height: 9px; border: 1px solid var(--gold); transform: rotate(45deg); }
+.fw-ch-label {
+  position: absolute; left: 50px; top: -8px; white-space: nowrap;
+  font: 400 var(--fs-label)/1 var(--font-ui); letter-spacing: .24em; text-transform: uppercase; color: var(--ivory);
+  text-shadow: 0 1px 10px rgba(4, 4, 16, .95), 0 0 2px rgba(4, 4, 16, .9);
+}
+html.is-touch .fw-ch-label { left: -40px; top: -66px; width: 80px; text-align: center; }
+
+/* Revision 6 — Mukta body, Yatra One accents (guide + charge label) */
+.act-fireworks .fw-guide p { font: 500 var(--fs-hint)/1.5 var(--font-body); letter-spacing: 0; text-transform: none; color: var(--ivory-80); }
+.act-fireworks .fw-guide .fw-guide-l1 { font: 400 clamp(1.3rem, 1.1rem + .6vw, 1.6rem)/1.3 var(--font-accent); letter-spacing: .01em; color: var(--marigold-text); }
+.act-fireworks .fw-guide .fw-guide-l2, .act-fireworks .fw-guide .fw-guide-l3 { color: var(--ivory-80); }
+.fw-ch-label { font: 400 var(--fs-btn)/1 var(--font-accent); letter-spacing: .02em; text-transform: none; color: var(--marigold-text); }
+@media (max-width: 760px) { .act-fireworks .fw-guide p { letter-spacing: 0; } .act-fireworks .fw-guide { top: 30%; } .act-fireworks .fw-sky { height: clamp(420px, 64vh, 620px); } }
+
+/* =====================================================================
+   Revision 7 — the festive deck: a cracker row (radiogroup), a main row (launch mode, count, haptics chip,
+   More options, Diwali night show, Go crazy), a "More options" tray (shape, colour, power, wind, trails,
+   echo), a status strip over the sky (sound invite, one-time reduced-motion chip) and the show's progress.
+   ===================================================================== */
+.act-fireworks.is-draw .fw-sky { touch-action: none; } /* phuljhadi: drawing on the sky, scroll from the header or deck */
+
+/* ---------- status strip over the top of the sky ---------- */
+.act-fireworks .fw-status {
+  position: absolute; left: 50%; top: 18px; z-index: 6; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: .55rem;
+  width: min(calc(100% - 32px), 780px); pointer-events: none;
+}
+.act-fireworks .fw-status > p {
+  pointer-events: auto; margin: 0;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .25rem .8rem;
+  padding: .3rem .4rem .3rem 1.05rem; border-radius: 30px;
+  background: rgba(6, 7, 22, .9); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  box-shadow: inset 0 0 0 1px rgba(255, 181, 46, .34), 0 12px 30px -14px rgba(0, 0, 0, .85);
+  font: 500 var(--fs-hint)/1.35 var(--font-body); color: var(--ivory); text-align: center;
+}
+.act-fireworks .fw-status > p[hidden] { display: none; }
+.act-fireworks .fw-status .btn-marigold { margin: 4px; }
+.act-fireworks .fw-bell { width: 15px; height: 22px; flex: none; color: var(--marigold); }
+.act-fireworks .fw-rmchip { font-size: var(--fs-ui); }
+.act-fireworks .fw-rm-x {
+  display: inline-grid; place-items: center; width: 44px; height: 44px; margin: 0; padding: 0; border: 0; border-radius: 50%;
+  background: none; color: var(--ivory-80); font: 400 1.5rem/1 var(--font-body);
+}
+.act-fireworks .fw-rm-x:hover, .act-fireworks .fw-rm-x:focus-visible { color: var(--ivory); background: rgba(255, 181, 46, .1); }
+
+/* ---------- the deck ---------- */
+.act-fireworks .fw-deck {
+  position: relative; z-index: 5;
+  display: flex; flex-direction: column; align-items: stretch; gap: 1.15rem;
+  max-width: 1240px; margin: 0 auto; padding: 2rem var(--gutter) 2.2rem;
+  background: radial-gradient(circle, rgba(255, 181, 46, .55) 0 1.6px, transparent 2.2px) 0 0 / 14px 6px repeat-x;
+}
+.act-fireworks .fw-deck::before {
+  content: ""; position: absolute; left: 50%; top: 0; width: 100vw; height: 100%; transform: translateX(-50%); z-index: -1; pointer-events: none;
+  background: linear-gradient(180deg, rgba(5, 7, 15, .72), rgba(5, 7, 15, .55) 60%, rgba(5, 7, 15, 0));
+}
+.act-fireworks .fw-showbar { position: absolute; left: var(--gutter); right: var(--gutter); top: -2px; height: 4px; border-radius: 2px; background: rgba(255, 181, 46, .16); opacity: 0; transition: opacity .6s var(--ease-lux); }
+.act-fireworks .fw-showbar b { display: block; width: 0; height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--marigold-deep), var(--haldi)); box-shadow: 0 0 10px rgba(255, 190, 80, .7); transition: width .25s linear; }
+.act-fireworks.is-show .fw-showbar { opacity: 1; }
+.act-fireworks .fw-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .9rem 1.4rem; }
+.act-fireworks .fw-glabel { margin: 0; font: 400 var(--fs-btn)/1.1 var(--font-accent); letter-spacing: .01em; color: var(--marigold-text); }
+
+/* the cracker row: seven festive "packets", icon + name + its Hindi name */
+.act-fireworks .fw-crackers {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; padding: 6px;
+  border-radius: 18px; background: rgba(5, 6, 20, .7); box-shadow: inset 0 0 0 1px rgba(255, 181, 46, .26);
+}
+.act-fireworks .fw-ck {
+  position: relative; display: grid; justify-items: center; align-content: center; gap: 3px;
+  min-width: 96px; min-height: 80px; margin: 0; padding: 9px 10px 8px;
+  border: 0; border-radius: 13px; background: none; color: var(--ivory-80);
+  font: 600 .9375rem/1.15 var(--font-body); letter-spacing: .005em; text-transform: none;
+  transition: color .35s var(--ease-lux), background-color .35s var(--ease-lux), box-shadow .45s var(--ease-lux), transform .25s var(--ease-out);
+}
+.act-fireworks .fw-ck svg { width: 30px; height: 30px; color: rgba(255, 196, 110, .9); transition: color .35s var(--ease-lux), filter .45s var(--ease-lux); }
+.act-fireworks .fw-ck-hi { font: 400 .875rem/1.2 var(--font-accent); color: rgba(255, 190, 85, .86); letter-spacing: 0; }
+.act-fireworks .fw-ck:hover { color: var(--ivory); background: rgba(255, 181, 46, .08); }
+.act-fireworks .fw-ck:active { transform: translateY(1px); }
+.act-fireworks .fw-ck[aria-checked="true"] {
+  color: var(--ivory);
+  background: linear-gradient(180deg, rgba(255, 181, 46, .22), rgba(232, 100, 26, .1));
+  box-shadow: inset 0 0 0 1.5px rgba(255, 190, 85, .8), 0 0 22px -6px rgba(255, 170, 50, .7);
+}
+.act-fireworks .fw-ck[aria-checked="true"] svg { color: var(--haldi); filter: drop-shadow(0 0 6px rgba(255, 190, 80, .65)); }
+.act-fireworks .fw-ck[aria-checked="true"]::before {
+  content: ""; position: absolute; top: 6px; right: 8px; width: 7px; height: 7px; border-radius: 50%;
+  background: radial-gradient(circle, #A84806 0 22%, var(--haldi) 30% 52%, var(--marigold-deep) 60%); box-shadow: 0 0 8px 1px rgba(255, 170, 50, .7);
+}
+.act-fireworks .fw-ck:focus-visible, .act-fireworks .fw-chip:focus-visible, .act-fireworks .fw-hap:focus-visible, .act-fireworks .fw-switch:focus-visible, .act-fireworks .fw-range:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* main row */
+.act-fireworks .fw-field { display: flex; align-items: center; gap: .8rem; }
+.act-fireworks .fw-meter { display: flex; align-items: baseline; gap: .6rem; margin: 0; font: 500 var(--fs-hint)/1 var(--font-body); color: var(--ivory-80); }
+.act-fireworks .fw-meter .fw-count { font: 400 var(--fs-num)/1 var(--font-accent); color: var(--marigold-text); font-variant-numeric: tabular-nums; }
+.act-fireworks .fw-sep { width: 7px; height: 7px; align-self: center; border-radius: 50%; background: var(--kumkum); box-shadow: 0 0 0 1.5px rgba(217, 164, 65, .85); }
+.act-fireworks .fw-noise b { font-weight: 600; color: var(--ivory); }
+.act-fireworks .fw-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .9rem 1rem; padding-top: 6px; }
+.act-fireworks .fw-tools .btn-marigold { margin: 5px; }
+.act-fireworks .fw-more[aria-expanded="true"] { color: var(--marigold-text); }
+/* the night show button: its flame stays lit while the show runs */
+.act-fireworks .fw-show[aria-pressed="true"] { --lit: 1; }
+.act-fireworks .fw-show[aria-pressed="true"]::after { opacity: 1; transform: translate(-1px, 0) scaleY(1.55) rotate(-45deg); animation: btn-flame 1.9s ease-in-out infinite alternate; }
+
+/* the haptics status chip: a little phone that buzzes whenever a haptic actually fires */
+.act-fireworks .fw-hap {
+  position: relative; display: inline-flex; align-items: center; gap: .55rem; max-width: 19rem;
+  min-height: 44px; margin: 0; padding: .3rem 1rem .3rem .35rem; border: 0; border-radius: 24px;
+  background: rgba(5, 6, 20, .74); box-shadow: inset 0 0 0 1.5px rgba(255, 181, 46, .4);
+  color: var(--ivory); font: 600 .9375rem/1.25 var(--font-body); letter-spacing: .005em; text-align: left;
+  transition: box-shadow .4s var(--ease-lux), color .4s var(--ease-lux);
+}
+.act-fireworks .fw-hap-ico { position: relative; display: inline-grid; place-items: center; flex: none; width: 34px; height: 34px; border-radius: 50%; background: rgba(255, 181, 46, .12); color: var(--marigold-text); }
+.act-fireworks .fw-hap-ico svg { width: 20px; height: 20px; }
+.act-fireworks .fw-hap-ico::after { content: ""; position: absolute; inset: -3px; border-radius: 50%; box-shadow: 0 0 0 2px rgba(255, 210, 74, .9); opacity: 0; }
+.act-fireworks .fw-hap[aria-pressed="true"] { box-shadow: inset 0 0 0 1.5px rgba(255, 210, 74, .85), 0 0 16px -4px rgba(255, 170, 50, .6); }
+.act-fireworks .fw-hap[aria-pressed="true"] .fw-hap-ico { background: rgba(255, 181, 46, .24); color: var(--haldi); }
+.act-fireworks .fw-hap[aria-pressed="false"]:not(.is-unsupported) .fw-hap-ico { color: var(--ivory-72); }
+.act-fireworks .fw-hap.is-unsupported { color: var(--ivory-80); box-shadow: inset 0 0 0 1px rgba(255, 181, 46, .28); cursor: help; }
+.act-fireworks .fw-hap.is-unsupported .fw-hap-ico { background: rgba(255, 244, 220, .07); color: var(--ivory-72); }
+.act-fireworks .fw-hap.is-unsupported .fw-hap-ico::before { content: ""; position: absolute; left: 7px; right: 7px; top: 50%; height: 1.5px; background: currentColor; transform: rotate(-45deg); }
+.act-fireworks .fw-hap.is-buzz .fw-hap-ico svg { animation: fw-buzz .42s linear; }
+.act-fireworks .fw-hap.is-buzz .fw-hap-ico::after { animation: fw-buzz-ring .6s var(--ease-out); }
+@keyframes fw-buzz { 0%, 100% { transform: translateX(0); } 15% { transform: translateX(-1.6px) rotate(-4deg); } 35% { transform: translateX(1.6px) rotate(4deg); } 55% { transform: translateX(-1.2px) rotate(-3deg); } 75% { transform: translateX(1px) rotate(2deg); } }
+@keyframes fw-buzz-ring { 0% { opacity: .9; transform: scale(.85); } 100% { opacity: 0; transform: scale(1.35); } }
+html.is-paused .act-fireworks .fw-hap * { animation: none !important; }
+
+/* ---------- More options tray ---------- */
+.act-fireworks .fw-tray {
+  position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.3rem 2.2rem;
+  width: min(100%, 1100px); margin: .4rem auto 0; padding: 1.7rem 1.8rem 1.2rem;
+  border-radius: 18px; background: linear-gradient(180deg, rgba(16, 13, 44, .96), rgba(6, 6, 22, .97));
+  box-shadow: inset 0 0 0 1px rgba(255, 181, 46, .3), 0 26px 50px -26px rgba(0, 0, 0, .85);
+}
+/* a genda-phool toran hangs along the top edge of the tray */
+.act-fireworks .fw-tray::before {
+  content: ""; position: absolute; left: 22px; right: 22px; top: -6px; height: 12px; pointer-events: none;
+  background:
+    radial-gradient(circle at 6px 6px, #FFD24A 0 2.2px, #EBA200 2.6px 5px, transparent 5.4px) 0 0 / 24px 12px repeat-x,
+    radial-gradient(circle at 18px 6px, #FFAE2E 0 2.2px, #E8780F 2.6px 5px, transparent 5.4px) 0 0 / 24px 12px repeat-x;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .5));
+}
+.act-fireworks .fw-tray[hidden] { display: none; }
+.act-fireworks .fw-tsec { min-width: 0; }
+.act-fireworks .fw-tsec--shape, .act-fireworks .fw-tsec--colour, .act-fireworks .fw-tfoot { grid-column: 1 / -1; }
+.act-fireworks .fw-tlabel { display: block; margin: 0 0 .6rem; font: 400 var(--fs-btn)/1.2 var(--font-accent); letter-spacing: .01em; color: var(--marigold-text); }
+.act-fireworks .fw-tlabel small { margin-left: .55em; font: 500 var(--fs-ui)/1.3 var(--font-body); color: var(--ivory-80); }
+.act-fireworks .fw-tlabel small[hidden] { display: none; }
+.act-fireworks .fw-chips { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; border-radius: 14px; background: rgba(5, 6, 20, .6); box-shadow: inset 0 0 0 1px rgba(255, 181, 46, .22); }
+.act-fireworks .fw-chip {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: 44px; min-width: 44px; margin: 0; padding: 0 .95rem 0 .7rem;
+  border: 0; border-radius: 10px; background: none; color: var(--ivory-80);
+  font: 500 var(--fs-ui)/1.2 var(--font-body); letter-spacing: .01em; text-transform: none;
+  transition: color .35s var(--ease-lux), background-color .35s var(--ease-lux);
+}
+.act-fireworks .fw-chip svg { width: 22px; height: 22px; flex: none; }
+.act-fireworks .fw-chip:hover { color: var(--ivory); background: rgba(255, 181, 46, .08); }
+.act-fireworks .fw-chip[aria-checked="true"] { color: var(--ivory); background: rgba(255, 181, 46, .16); box-shadow: inset 0 0 0 1.5px rgba(255, 190, 85, .72); }
+.act-fireworks .fw-chip[aria-checked="true"] svg { color: var(--haldi); }
+.act-fireworks .fw-gem { width: 20px; height: 20px; flex: none; border-radius: 50%; box-shadow: 0 0 0 2px rgba(5, 7, 15, .9), 0 0 0 3.5px rgba(217, 164, 65, .55); }
+.act-fireworks .fw-chip[aria-checked="true"] .fw-gem { box-shadow: 0 0 0 2px rgba(5, 7, 15, .9), 0 0 0 3.5px var(--marigold), 0 0 12px rgba(255, 190, 80, .6); }
+.act-fireworks .fw-gem--rainbow { background: conic-gradient(#FF4D4D, #FFB347, #FFF06A, #6CFF8A, #4DD8FF, #7A7BFF, #E06BFF, #FF4D4D); }
+.act-fireworks .fw-gem--gold { background: radial-gradient(circle at 38% 34%, #FFF4DC, #FFD778 40%, #E2A63A 80%); }
+.act-fireworks .fw-gem--pinkpurple { background: linear-gradient(135deg, #FF6FD0, #DB59C8 45%, #A77BFF); }
+.act-fireworks .fw-gem--saffrongreen { background: linear-gradient(180deg, #FF9F32 0 34%, #FFF4DC 34% 66%, #2EBD5A 66%); }
+.act-fireworks .fw-gem--random { background: conic-gradient(#FFD778 0 25%, #FF6FD0 0 50%, #3FD0C9 0 75%, #FF8A3D 0); }
+.act-fireworks .fw-chip--gem[aria-checked="true"] .fw-gem--rainbow { animation: fw-rainbow-spin 6s linear infinite; }
+@keyframes fw-rainbow-spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+html.is-calm .act-fireworks .fw-gem--rainbow { animation: none !important; }
+.act-fireworks .fw-tsec--feel { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 1.1rem 2.6rem; }
+.act-fireworks .fw-tfield { min-width: 0; }
+.act-fireworks .fw-tfield--power { display: grid; grid-template-columns: minmax(150px, 220px) auto; align-items: center; column-gap: .9rem; }
+.act-fireworks .fw-tfield--power .fw-tlabel { grid-column: 1 / -1; }
+.act-fireworks .fw-range { width: 100%; height: 44px; margin: 0; background: none; accent-color: var(--marigold); cursor: pointer; }
+.act-fireworks .fw-range::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, rgba(255, 181, 46, .85), rgba(255, 181, 46, .3)); }
+.act-fireworks .fw-range::-moz-range-track { height: 4px; border-radius: 2px; background: rgba(255, 181, 46, .45); }
+.act-fireworks .fw-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; margin-top: -10px; border-radius: 50%; background: radial-gradient(circle, #A84806 0 20%, var(--haldi) 28% 50%, var(--marigold-deep) 62%); box-shadow: 0 0 0 1.5px rgba(255, 210, 74, .9), 0 0 10px rgba(255, 170, 50, .5); }
+.act-fireworks .fw-range::-moz-range-thumb { width: 24px; height: 24px; border: 0; border-radius: 50%; background: radial-gradient(circle, #A84806 0 20%, var(--haldi) 28% 50%, var(--marigold-deep) 62%); box-shadow: 0 0 0 1.5px rgba(255, 210, 74, .9); }
+.act-fireworks .fw-range { -webkit-appearance: none; appearance: none; }
+.act-fireworks .fw-out { min-width: 3.2ch; font: 400 1.35rem/1 var(--font-accent); color: var(--marigold-text); }
+/* trails switch: a kumkum bead that slides into a lit marigold */
+.act-fireworks .fw-switch { display: inline-flex; align-items: center; gap: .7rem; min-height: 44px; margin: 0; padding: 0 .2rem; border: 0; background: none; color: var(--ivory-80); font: 600 var(--fs-ui)/1 var(--font-body); }
+.act-fireworks .fw-switch i { position: relative; width: 52px; height: 28px; border-radius: 14px; background: rgba(5, 6, 20, .8); box-shadow: inset 0 0 0 1.5px rgba(217, 164, 65, .6); transition: background .3s var(--ease-lux), box-shadow .3s var(--ease-lux); }
+.act-fireworks .fw-switch i::after { content: ""; position: absolute; left: 5px; top: 50%; width: 18px; height: 18px; margin-top: -9px; border-radius: 50%; background: radial-gradient(circle at 40% 36%, #E0283F, #A8122A 60%, #6E0A1B); box-shadow: 0 0 0 1.5px rgba(217, 164, 65, .8); transition: left .3s var(--ease-out), background .3s; }
+.act-fireworks .fw-switch[aria-checked="true"] { color: var(--haldi); }
+.act-fireworks .fw-switch[aria-checked="true"] i { background: rgba(255, 181, 46, .18); box-shadow: inset 0 0 0 1.5px var(--marigold); }
+.act-fireworks .fw-switch[aria-checked="true"] i::after { left: 29px; background: radial-gradient(circle, #A84806 0 20%, var(--haldi) 28% 50%, var(--marigold-deep) 62%); box-shadow: 0 0 0 1.5px rgba(255, 210, 74, .9), 0 0 10px 1px rgba(255, 170, 50, .65); }
+.act-fireworks .fw-tsec--echo { grid-column: 1 / -1; }
+.act-fireworks .fw-echo-row { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; }
+.act-fireworks .fw-echo-on[hidden] { display: none; }
+.act-fireworks .fw-tfoot {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .6rem 1rem; padding-top: 1rem;
+  background: radial-gradient(circle, rgba(255, 181, 46, .4) 0 1.3px, transparent 1.9px) 0 0 / 12px 5px repeat-x;
+}
+.act-fireworks .fw-legend { margin: 0; text-align: center; font: 500 var(--fs-ui)/1.6 var(--font-body); color: var(--ivory-80); }
+.act-fireworks .fw-legend i { display: inline-block; width: 7px; height: 7px; margin: 0 .6em .12em; vertical-align: middle; border-radius: 50%; background: var(--kumkum); box-shadow: 0 0 0 1.5px rgba(217, 164, 65, .85); }
+
+/* the barrage indicator: a spinning garland ring at the finger */
+.fw-charge.is-barrage .fw-ch-ring { background: repeating-conic-gradient(var(--marigold) 0 12deg, transparent 12deg 30deg); animation: fw-barrage .9s linear infinite; }
+.fw-charge.is-barrage .fw-ch-beam { opacity: 0 !important; }
+@keyframes fw-barrage { to { transform: rotate(360deg); } }
+html.is-paused .fw-charge.is-barrage .fw-ch-ring { animation: none; }
+
+/* the bijli bomb's soft white flash: fixed, in the zone, BEHIND the zone's text and controls (opacity <= .16) */
+.fw-flash { position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0; background: radial-gradient(circle at 50% 55%, #FFFFFF, #FFF4DC 45%, rgba(255, 244, 220, .5)); }
+
+@media (max-width: 760px) {
+  .act-fireworks .fw-status { top: 12px; }
+  .act-fireworks .fw-status > p { padding: .35rem .4rem .35rem .85rem; font-size: var(--fs-ui); border-radius: 22px; }
+  .act-fireworks .fw-deck { padding-top: 1.4rem; gap: 1rem; }
+  .act-fireworks .fw-row--crackers { flex-direction: column; gap: .55rem; }
+  .act-fireworks .fw-crackers { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; gap: 4px; padding: 4px; }
+  .act-fireworks .fw-ck { min-width: 0; min-height: 66px; padding: 7px 2px 6px; font-size: .84375rem; }
+  .act-fireworks .fw-ck svg { width: 26px; height: 26px; }
+  .act-fireworks .fw-ck-hi { display: none; }
+  .act-fireworks .fw-row--main { flex-direction: column; gap: .8rem; }
+  .act-fireworks .fw-field--mode { flex-direction: column; gap: .45rem; }
+  .act-fireworks .fw-hap { max-width: 100%; }
+  .act-fireworks .fw-tray { grid-template-columns: minmax(0, 1fr); padding: 1.4rem 1rem 1rem; gap: 1.1rem; }
+  .act-fireworks .fw-tfield--power { grid-template-columns: minmax(0, 1fr) auto; width: 100%; }
+  .act-fireworks .fw-tsec--feel .fw-tfield { flex: 1 1 100%; }
+  .act-fireworks .fw-chip { padding: 0 .75rem 0 .55rem; }
+}
+@media (max-width: 760px) {
+  .act-fireworks .fw-row--main { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; }
+  .act-fireworks .fw-meter { order: 1; }
+  .act-fireworks .fw-hap { order: 2; }
+  .act-fireworks .fw-field--mode { order: 0; }
+  .act-fireworks .fw-tools { order: 3; gap: .7rem .6rem; }
+  .act-fireworks .fw-tools .fw-more { flex: 1 0 100%; max-width: 15rem; }
+}
+/* R7 perf: every layer the shake moves is its own compositor layer, so a 2-8px translate never repaints the
+   temple-town SVG or the full-screen canvases (translate only; no scale anywhere) */
+.act-fireworks .fw-skyline, #zone-fireworks .zone-scenery, #zone-fireworks .e2m-screen, #e2m-ambient { will-change: translate; }
+/* the guide steps down while the status strip (sound invite / reduced-motion chip) sits over the sky */
+.act-fireworks.has-status .fw-guide { top: 41%; }
+.act-fireworks.has-status-2 .fw-guide { top: 48%; }
+@media (max-width: 760px) {
+  .act-fireworks.has-status .fw-guide { top: 46%; }
+  .act-fireworks.has-status-2 .fw-guide { top: 56%; }
+  .act-fireworks .fw-invite .fw-bell { display: none; }
+  .act-fireworks .fw-invite { padding-left: .9rem; }
+}

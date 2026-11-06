@@ -1,0 +1,499 @@
+/* E2M Diwali — world: sky, HUD, opening gate, props (bells, lanterns, hidden diyas), finale, footer
+   Revision 1: darker, calmer, one focal point per screen. */
+
+/* ---------- Sky — Revision 4: ONE continuous deep-space backdrop, fixed behind the whole page.
+   Three star depths drift very slowly by TRANSLATE only and twinkle by OPACITY only; a faint indigo/magenta
+   nebula. Nothing here ever scales or zooms, and it never shakes (impacts move the active zone only). ---------- */
+.sky {
+  /* bleeds past the viewport so the slow star drift never shows an edge */
+  position: fixed; inset: -64px; z-index: 0; pointer-events: none; overflow: hidden;
+  background: linear-gradient(180deg, var(--space-0) 0%, var(--space-1) 46%, #0B0C28 78%, #0E0C2E 100%);
+}
+.sky-nebula {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(44% 30% at 80% 14%, var(--nebula-indigo), transparent 70%),
+    radial-gradient(38% 26% at 12% 52%, var(--nebula-magenta), transparent 72%),
+    radial-gradient(52% 30% at 62% 74%, rgba(70, 64, 190, .06), transparent 72%),
+    radial-gradient(70% 36% at 50% 104%, rgba(36, 16, 68, .26), transparent 74%);
+}
+.sky-stars { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.sky-stars--far { animation: stars-far 240s linear infinite alternate; }
+.sky-stars--mid { animation: stars-mid 170s linear infinite alternate; }
+.sky-stars--near { animation: stars-near 120s linear infinite alternate; }
+@keyframes stars-far { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-14px, 6px, 0); } }
+@keyframes stars-mid { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-24px, 10px, 0); } }
+@keyframes stars-near { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-38px, 16px, 0); } }
+.sky-stars .tw { animation: star-tw 7s ease-in-out infinite alternate; }
+@keyframes star-tw { from { opacity: .22; } to { opacity: .9; } }
+html.is-calm .sky-stars { animation: none !important; }
+main, .site-foot { position: relative; z-index: 2; }
+
+/* ---------- HUD: mark left, progress hairline centre, sound right ---------- */
+.hud {
+  position: fixed; top: 0; left: 0; right: 0; height: var(--hud-h);
+  z-index: var(--z-hud);
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 0 calc(var(--gutter) + var(--safe-right)) 0 calc(var(--gutter) + var(--safe-left));
+  padding-top: var(--safe-top); height: calc(var(--hud-h) + var(--safe-top));
+  transition: transform 1.2s var(--ease-out), opacity 1.2s var(--ease-out), background-color .8s var(--ease-lux);
+}
+.hud::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-faint) 20%, var(--gold-faint) 80%, transparent);
+  opacity: 0; transition: opacity .8s var(--ease-lux);
+}
+.hud.is-scrolled { background-color: rgba(5, 6, 20, .72); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+.hud.is-scrolled::after { opacity: 1; }
+html.has-opening .hud { transform: translateY(-100%); opacity: 0; pointer-events: none; }
+.hud-brand { display: inline-flex; align-items: center; min-height: 44px; color: var(--ivory); text-decoration: none; }
+.hud-brand:hover { color: var(--gold); }
+.hud-brand { padding: 8px 8px 8px 0; }
+/* Revision 3: the official E2M mark (white, as supplied) — never redrawn, never distorted */
+.hud-logo { display: block; width: 28px; height: 28px; object-fit: contain; opacity: .92; transition: opacity .6s var(--ease-lux), filter .6s var(--ease-lux); }
+.hud-brand:hover .hud-logo, .hud-brand:focus-visible .hud-logo { opacity: 1; filter: drop-shadow(0 0 8px rgba(255, 215, 120, .5)); }
+
+.hud-nav { position: relative; flex: 0 1 auto; }
+.hud-track { position: relative; width: clamp(220px, 28vw, 420px); }
+.hud-line { position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(255, 215, 120, .22); pointer-events: none; }
+.hud-marker {
+  position: absolute; top: 50%; left: var(--hud-p, 0%);
+  width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px;
+  background: var(--gold); transform: rotate(45deg);
+  box-shadow: 0 0 10px 1px rgba(255, 215, 120, .45);
+  transition: left .5s var(--ease-out);
+}
+.hud-line::before { content: ""; position: absolute; left: 0; top: 0; height: 1px; width: var(--hud-p, 0%); background: linear-gradient(90deg, rgba(255, 215, 120, .2), var(--gold)); transition: width .5s var(--ease-out); }
+.hud-zones { position: relative; display: flex; align-items: stretch; height: 44px; }
+.hud-zones li { flex: 1 1 0; }
+.hud-zones a { position: relative; display: block; height: 100%; color: var(--ivory); text-decoration: none; }
+.hud-zones a:focus-visible { outline-offset: -8px; }
+.dot-label {
+  position: absolute; top: calc(100% + 4px); left: 50%;
+  transform: translate(-50%, -4px);
+  white-space: nowrap; padding: .45rem .75rem;
+  font: 400 var(--fs-micro)/1 var(--font-ui); letter-spacing: var(--track-label); text-transform: uppercase;
+  color: var(--ivory-80);
+  background: rgba(5, 6, 20, .96); border: 1px solid var(--gold-hair-soft);
+  opacity: 0; pointer-events: none; transition: opacity .5s var(--ease-lux), transform .6s var(--ease-out);
+}
+.dot-label b { color: var(--gold); font-weight: 400; margin-right: .5em; }
+.hud-zones a:hover .dot-label, .hud-zones a:focus-visible .dot-label { opacity: 1; transform: translate(-50%, 0); }
+.hud-zones a.is-current .dot-label b { color: var(--gold); }
+.hud-map {
+  display: none; align-items: center; min-height: 44px; padding: 0 .9rem;
+  background: none; border: 0; color: var(--ivory-80);
+  font: 400 var(--fs-label)/1 var(--font-ui); letter-spacing: var(--track-label); text-transform: uppercase;
+}
+.hud-map:hover, .hud-map[aria-expanded="true"] { color: var(--gold); }
+.hud-right { display: flex; align-items: center; gap: .9rem; }
+.hud-found {
+  display: none; align-items: center; gap: .45rem; height: 44px;
+  font: 400 var(--fs-micro)/1 var(--font-ui); letter-spacing: .14em; color: var(--gold-text); white-space: nowrap;
+  opacity: 0; transition: opacity 1.2s var(--ease-lux);
+}
+.hud-found.is-shown { display: flex; }
+.hud-found.is-in { opacity: 1; }
+.hud-found b { font-weight: 400; }
+.hud-found-mark {
+  width: 5px; height: 8px; border-radius: 50% 50% 45% 45% / 64% 64% 36% 36%;
+  background: radial-gradient(ellipse at 50% 76%, #fff 0 14%, var(--gold) 46%, var(--saffron) 86%);
+  box-shadow: 0 0 6px 1px rgba(255, 180, 70, .5);
+}
+.hud-sound {
+  display: flex; align-items: center; justify-content: center; gap: .55rem;
+  min-height: 44px; min-width: 44px; padding: 0 .2rem 0 .4rem;
+  border: 0; background: none; color: var(--ivory-72);
+  font: 400 var(--fs-micro)/1 var(--font-ui); letter-spacing: var(--track-label); text-transform: uppercase;
+  transition: color .6s var(--ease-lux);
+}
+.hud-sound:hover { color: var(--ivory); }
+.hud-sound svg, .op-sound svg { width: 18px; height: 18px; flex: none; }
+[data-sound-toggle].is-on { --s-wave: 1; --s-mute: 0; color: var(--gold); }
+@media (max-width: 899px) {
+  .hud { gap: 8px; }
+  .hud-nav { position: static; }
+  .hud-map { display: inline-flex; }
+  .hud-track { position: static; width: auto; }
+  /* progress becomes a full-width hairline along the HUD's bottom edge */
+  .hud-line { top: auto; bottom: 0; left: 0; right: 0; background: rgba(255, 215, 120, .12); }
+  .hud-marker { width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; }
+  .hud::after { display: none; }
+  .hud-zones {
+    position: fixed; top: calc(var(--hud-h) + var(--safe-top)); left: 0; right: 0; height: auto; max-height: calc(100vh - var(--hud-h) - var(--safe-top)); overflow-y: auto;
+    display: none; flex-direction: column; padding: 14px var(--gutter) 22px;
+    background: rgba(5, 6, 20, .97); border-bottom: 1px solid var(--gold-hair-soft);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    z-index: var(--z-panel);
+  }
+  .hud-nav.is-open .hud-zones { display: flex; }
+  .hud-zones li { flex: none; border-bottom: 1px solid rgba(255, 215, 120, .08); }
+  .hud-zones li:last-child { border-bottom: 0; }
+  .hud-zones a { height: 50px; display: flex; align-items: center; }
+  .dot-label { position: static; opacity: 1; transform: none; background: none; border: 0; padding: 0; font-size: .74rem; }
+  .dot-label b { display: inline-block; min-width: 3.2em; font: 300 1.15rem/1 var(--font-display); letter-spacing: .04em; vertical-align: -.12em; }
+  .hud-zones a.is-current .dot-label { color: var(--gold); }
+  .hud-sound-label { display: none; }
+  .hud-sound { padding: 0; }
+  .hud-right { gap: .3rem; }
+}
+
+/* ---------- Opening ---------- */
+.opening {
+  /* Revision 3: the doorway is a Hindu temple door — a rectangle with a corbelled, stepped lintel (no cusped arch) */
+  --arch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 58' preserveAspectRatio='none'%3E%3Cpath d='M0 58V5H2V2.5H4.5V0H35.5V2.5H38V5H40V58z'/%3E%3C/svg%3E");
+  position: relative; height: 100vh; height: 100svh; min-height: 600px;
+  /* R4: clip sideways only, so the temple ground can dissolve downward into the deep-space sky (::after) */
+  overflow-x: clip; overflow-y: visible; isolation: isolate;
+}
+/* Revision 4: the temple town's ground never ends on a hard line — it continues 260px below the gate and
+   dissolves into the one continuous space backdrop behind the Fireworks zone */
+.opening::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 260px; z-index: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(6, 8, 26, .97), rgba(6, 8, 26, .72) 30%, rgba(6, 8, 26, .3) 64%, rgba(6, 8, 26, 0));
+}
+.op-motes { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.op-facade { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; transform-origin: 50% 70%; }
+.op-facade svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* the live overlays (lamps, flags, light spill) sit on their own layer so the big temple art never repaints */
+.op-facade-live, .gopuram-live, .act-fireworks .fw-live { will-change: transform; }
+.tk-spill { mix-blend-mode: screen; }
+.op-motes { z-index: 3; }
+.op-toran { top: 0; height: 74px; z-index: 5; opacity: .72; transform-origin: 50% 0; animation: toran-sway 9s ease-in-out infinite alternate; }
+@keyframes toran-sway { 0% { transform: translateX(-50%) rotate(-.25deg) translateY(0); } 100% { transform: translateX(-50%) rotate(.25deg) translateY(1.5px); } }
+
+/* the gopuram gate: a fixed 100:140 box so the tower art (SVG) and the real doors (HTML) always align */
+.gate {
+  position: absolute; z-index: 2; left: 50%; bottom: 0;
+  height: min(90%, 128vw); aspect-ratio: 100 / 140; width: auto;
+  transform: translateX(-50%); transform-origin: 50% 75%;
+}
+.gopuram { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.arch-portal, .arch-line { position: absolute; left: 31%; top: 57%; width: 38%; height: 36.2%; }
+.arch-portal {
+  -webkit-mask: var(--arch) center / 100% 100% no-repeat; mask: var(--arch) center / 100% 100% no-repeat;
+  perspective: 1600px; background: #050414; overflow: hidden;
+}
+.arch-line { pointer-events: none; overflow: visible; z-index: 1; opacity: .6; }
+.portal-light {
+  position: absolute; inset: 0; opacity: .06;
+  background: radial-gradient(60% 48% at 50% 64%, #FFFFFF, #FFF4DC 18%, #FFD778 40%, #E89A3A 66%, #3A1608 100%);
+}
+.portal-seam {
+  position: absolute; left: 50%; top: 4%; bottom: 0; width: 1px; z-index: 3; transform: translateX(-50%);
+  background: linear-gradient(180deg, transparent 0, rgba(255, 215, 120, .12) 30%, rgba(255, 215, 120, .4) 80%, #FFE7A3);
+  filter: drop-shadow(0 0 4px rgba(255, 196, 96, .6));
+}
+/* carved temple doors: teak leaves, brass studs, panels, a ring pull */
+.door {
+  position: absolute; top: 0; bottom: 0; width: 50%; z-index: 2;
+  background-color: #120A22;
+  background-image:
+    radial-gradient(circle, rgba(255, 215, 120, .34) 0 1.1px, rgba(255, 215, 120, .08) 1.8px, transparent 2.4px),
+    linear-gradient(90deg, #1A0F2C, #110A22 60%, #0B0719);
+  background-size: 22px 22px, 100% 100%;
+  background-position: 6px 8px, 0 0;
+  backface-visibility: hidden;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, .55), inset -1px 0 0 rgba(255, 215, 120, .12);
+}
+.door--l { left: 0; transform-origin: 0 50%; }
+.door--r { right: 0; transform-origin: 100% 50%; background-image: radial-gradient(circle, rgba(255, 215, 120, .34) 0 1.1px, rgba(255, 215, 120, .08) 1.8px, transparent 2.4px), linear-gradient(270deg, #1A0F2C, #110A22 60%, #0B0719); box-shadow: inset 0 0 40px rgba(0, 0, 0, .55), inset 1px 0 0 rgba(255, 215, 120, .12); }
+.door-panel { position: absolute; left: 16%; right: 12%; border: 1px solid rgba(255, 215, 120, .16); background: rgba(10, 6, 24, .55); box-shadow: inset 0 0 0 3px rgba(10, 6, 24, .6), inset 0 0 0 4px rgba(255, 215, 120, .08); }
+.door--r .door-panel { left: 12%; right: 16%; }
+.door-panel--top { top: 8%; height: 40%; }
+.door-panel--bot { top: 56%; height: 34%; }
+.door-ring { position: absolute; top: 50%; width: 12px; height: 12px; margin-top: -6px; border-radius: 50%; border: 1.4px solid rgba(217, 164, 65, .6); }
+.door--l .door-ring { right: 6%; }
+.door--r .door-ring { left: 6%; }
+/* temple bells hang in the doorway and sway in the night air */
+.gate-bell { position: absolute; top: 57.4%; z-index: 4; width: 3.4%; aspect-ratio: 32 / 46; color: #C2923F; transform-origin: 50% -140%; animation: gate-bell 6.5s ease-in-out infinite alternate; }
+.gate-bell::before { content: ""; position: absolute; left: 50%; bottom: 100%; width: 1px; height: 140%; background: rgba(255, 215, 120, .4); }
+.gate-bell svg { display: block; width: 100%; height: 100%; --sym-line: rgba(40, 20, 4, .5); filter: drop-shadow(0 0 6px rgba(255, 180, 80, .25)); }
+.gate-bell--l { left: 36%; top: 61%; }
+.gate-bell--r { right: 36%; top: 61%; animation-delay: -2.8s; animation-duration: 7.2s; }
+.gate-bell.is-ringing { animation: bell-swing 2.6s cubic-bezier(.3, .6, .4, 1); }
+@keyframes gate-bell { 0% { rotate: -2.2deg; } 100% { rotate: 2.2deg; } }
+html.is-calm .gate-bell, html.is-calm .op-toran { animation: none; }
+
+.threshold { position: absolute; left: -5%; right: -5%; bottom: 0; height: 10%; z-index: 3; }
+.steps { position: absolute; inset: 0; display: flex; flex-direction: column-reverse; align-items: center; }
+.steps i {
+  display: block; height: 30%; width: 100%;
+  background: linear-gradient(180deg, #120B26, #08061A);
+  box-shadow: inset 0 1px 0 rgba(255, 215, 120, .22);
+}
+.steps i:nth-child(2) { width: 92%; }
+.steps i:nth-child(3) { width: 84%; }
+.th-diyas { position: absolute; left: 10%; right: 10%; bottom: 88%; display: flex; justify-content: space-between; align-items: flex-end; }
+.th-diya { position: relative; width: clamp(18px, 2.4vw, 30px); aspect-ratio: 64 / 40; }
+.th-diya svg { width: 100%; height: 100%; color: #7A3A18; }
+.th-diya .e2m-flame { --fw: 30%; --fly: 52%; --fs: .8; }
+.th-gap { flex: 0 0 26%; }
+.central-diya { position: absolute; left: 50%; bottom: 86%; width: clamp(54px, 6vw, 84px); aspect-ratio: 64 / 40; transform: translateX(-50%); }
+.cd-body { width: 100%; height: 100%; color: #A7792A; --sym-line: rgba(255, 244, 220, .6); filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .5)); }
+.cd-flame { --fw: 22%; --fly: 50%; opacity: 0; }
+.central-diya::before {
+  content: ""; position: absolute; left: 50%; bottom: 50%; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%;
+  background: #FF7A3A; box-shadow: 0 0 8px 3px rgba(255, 106, 42, .45); animation: ember 3.2s ease-in-out infinite alternate;
+}
+@keyframes ember { from { opacity: .35; } to { opacity: .9; } }
+.cd-glow {
+  position: absolute; left: 50%; bottom: 50%; width: 520%; aspect-ratio: 1; height: auto;
+  transform: translate(-50%, 50%) scale(.2); opacity: 0; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(255, 244, 220, .7), rgba(255, 215, 120, .38) 30%, rgba(255, 159, 50, .12) 60%, transparent);
+}
+.central-diya.is-lit::before { opacity: 0; animation: none; }
+.central-diya.is-lit .cd-flame { opacity: 1; }
+
+.opening-copy {
+  position: absolute; z-index: 6; left: 50%; top: 44%;
+  transform: translate(-50%, -50%);
+  width: min(calc(100vw - 40px), 1180px);
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+}
+.opening-copy::before {
+  content: ""; position: absolute; inset: -14% -4%; z-index: -1; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(4, 4, 16, .82), rgba(4, 4, 16, .5) 55%, rgba(4, 4, 16, 0));
+}
+.op-brand { margin-bottom: clamp(.9rem, 2.2vh, 1.4rem); padding: 10px; }
+.op-logo { display: block; width: clamp(44px, 4.4vw, 60px); height: auto; aspect-ratio: 1; filter: drop-shadow(0 0 18px rgba(255, 215, 120, .28)); }
+.op-eyebrow { display: inline-flex; align-items: center; gap: .9em; }
+.op-dot { display: inline-block; width: 3px; height: 3px; background: currentColor; transform: rotate(45deg); opacity: .8; }
+.op-title {
+  margin-top: clamp(1.4rem, 3.4vh, 2.4rem);
+  font-family: var(--font-display); font-weight: 300;
+  font-size: clamp(2.5rem, .9rem + 6.6vw, 7.4rem); line-height: 1.02;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--ivory);
+  margin-right: -.14em; /* optical centring of the trailing tracking */
+  text-shadow: 0 2px 40px rgba(4, 4, 16, .7);
+}
+.op-line { display: block; white-space: nowrap; }
+.op-line--2 { color: #F4E3BC; }
+.op-title .ch { display: inline-block; will-change: transform, opacity; }
+.op-sub {
+  margin-top: clamp(1.2rem, 3vh, 2rem);
+  font: italic 300 clamp(1.35rem, 1.1rem + .9vw, 2rem)/1.2 var(--font-display);
+  letter-spacing: .02em; color: var(--gold);
+}
+.op-copy { margin-top: .9rem; max-width: 30rem; font-size: clamp(.95rem, .9rem + .2vw, 1.06rem); line-height: 1.7; color: var(--ivory-60); }
+.op-actions { display: flex; flex-direction: column; align-items: center; gap: .9rem; margin-top: clamp(1.8rem, 4.4vh, 3rem); }
+.op-cta { min-width: 17rem; background: rgba(4, 4, 16, .35); }
+.op-sound {
+  display: inline-flex; align-items: center; gap: .6rem; min-height: 44px; padding: 0 1rem;
+  background: none; border: 0; color: var(--ivory-72);
+  font: 400 var(--fs-micro)/1 var(--font-ui); letter-spacing: var(--track-label); text-transform: uppercase;
+  transition: color .6s var(--ease-lux);
+}
+.op-sound:hover { color: var(--ivory); }
+.op-sound.is-on { color: var(--gold); }
+@media (max-width: 600px) {
+  .op-eyebrow { letter-spacing: .22em; font-size: .62rem; }
+  .op-title { letter-spacing: .08em; margin-right: -.08em; font-size: clamp(2.1rem, 10.4vw, 3.4rem); }
+  .opening-copy { top: 44%; }
+  .op-toran { height: 52px; }
+}
+@media (max-height: 640px) and (min-width: 601px) {
+  .op-copy { display: none; }
+}
+
+/* ---------- Shared world props ---------- */
+[data-garland] { position: absolute; left: 50%; width: 100vw; transform: translateX(-50%); pointer-events: none; }
+[data-garland] svg { width: 100%; height: 100%; overflow: visible; }
+
+/* Bells (only two on the page): a hairline cord, a small brass bell, rings on click only */
+.bell {
+  position: absolute; top: calc(-1 * var(--zone-pad) + 96px); left: var(--bx, 50%); z-index: 4;
+  width: 44px; margin-left: -22px; padding: 0; border: 0; background: none;
+  color: #B8893A; transform-origin: 50% -60px;
+}
+.bell::before { content: ""; position: absolute; left: 50%; bottom: 100%; width: 1px; height: 96px; background: linear-gradient(transparent, rgba(255, 215, 120, .28)); }
+.bell svg { width: 24px; height: 35px; margin: 0 auto; --sym-line: rgba(40, 20, 4, .5); transition: color .6s var(--ease-lux); }
+.bell:hover { color: var(--gold); }
+.bell--shrine { top: -86px; }
+.bell--shrine::before { height: 60px; }
+.bell.is-ringing { animation: bell-swing 2.6s cubic-bezier(.3, .6, .4, 1); }
+/* Revision 2: a struck bell sends one hairline ring outward from its lip */
+.bell::after {
+  content: ""; position: absolute; left: 50%; top: 30px; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%;
+  border: 1px solid rgba(255, 215, 120, .55); opacity: 0; pointer-events: none;
+}
+.bell.is-ringing::after { animation: bell-ripple 1.5s cubic-bezier(.16, .84, .3, 1); }
+@keyframes bell-ripple { 0% { opacity: .9; transform: scale(.4); } 100% { opacity: 0; transform: scale(4.2); } }
+@keyframes bell-swing {
+  0% { rotate: 0deg; } 10% { rotate: 12deg; } 26% { rotate: -9deg; } 42% { rotate: 6deg; }
+  58% { rotate: -4deg; } 74% { rotate: 2deg; } 88% { rotate: -.8deg; } 100% { rotate: 0deg; }
+}
+
+/* Draggable lanterns (two): muted paper, slow drift */
+.w-lantern {
+  --k-paper: #B07A2C; --k-paper-2: #6E3E12; --k-tassel: rgba(255, 215, 120, .7);
+  position: absolute; left: var(--lx, 50%); top: var(--ly, 20%); z-index: 4;
+  width: 40px; height: 75px; margin-left: -20px; padding: 0; border: 0; background: none;
+  translate: var(--dx, 0px) var(--dy, 0px);
+  rotate: var(--sway, 0deg); transform-origin: 50% 0;
+  touch-action: none; cursor: grab; opacity: .85;
+}
+.w-lantern svg { width: 100%; height: 100%; animation: lantern-bob 12s ease-in-out infinite; filter: drop-shadow(0 0 10px rgba(255, 159, 50, .28)); }
+.w-lantern::before {
+  content: ""; position: absolute; left: 50%; top: 40%; width: 200%; aspect-ratio: 1; height: auto;
+  transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(255, 180, 80, .14), transparent);
+}
+.w-lantern:hover { opacity: 1; }
+.w-lantern.is-dragging { cursor: grabbing; opacity: 1; }
+.w-lantern.is-dragging svg { animation-play-state: paused; filter: brightness(1.15) drop-shadow(0 0 18px rgba(255, 196, 96, .5)); }
+.w-lantern.is-flying { transition: translate 4.2s cubic-bezier(.4, 0, .6, 1); }
+@keyframes lantern-bob { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-6px) rotate(1deg); } }
+@media (max-width: 760px) {
+  .w-lantern { width: 32px; height: 60px; margin-left: -16px; }
+}
+
+/* Hidden diyas (seven): nearly invisible until you look; a rare, faint glint */
+.hidden-diya {
+  position: absolute; left: var(--hx, 50%); top: var(--hy, 50%); z-index: 5;
+  width: 44px; height: 44px; margin: -22px 0 0 -22px; padding: 0; border: 0; background: none;
+  display: grid; place-items: center; opacity: .34; transition: opacity .8s var(--ease-lux);
+}
+.hidden-diya svg { width: 20px; height: 12px; margin-top: 12px; color: #4A2410; --sym-line: rgba(255, 215, 120, .3); transition: color .8s; }
+.hidden-diya .e2m-flame { --fw: 6px; --fly: 44%; opacity: 0; }
+.hidden-diya::after {
+  content: ""; position: absolute; left: 60%; top: 32%; width: 7px; height: 7px;
+  background: var(--ivory);
+  clip-path: polygon(50% 0, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0 50%, 42% 42%);
+  opacity: 0; animation: glint 15s ease-in-out infinite; animation-delay: var(--gd, 0s);
+}
+@keyframes glint { 0%, 90%, 100% { opacity: 0; transform: scale(.3) rotate(0); } 94% { opacity: .8; transform: scale(1) rotate(45deg); } }
+.hidden-diya:hover, .hidden-diya:focus-visible { opacity: .9; }
+.hidden-diya.is-found { opacity: 1; }
+.hidden-diya.is-found::after { display: none; }
+.hidden-diya.is-found svg { color: #A7792A; }
+.hidden-diya.is-found .e2m-flame { opacity: 1; }
+/* Revision 2: being found earns a shimmer — a slow gold sweep across the little lamp */
+.hidden-diya.is-shimmer { animation: hd-shimmer 1.4s var(--ease-out); }
+@keyframes hd-shimmer { 0% { filter: brightness(1) drop-shadow(0 0 0 rgba(255, 215, 120, 0)); transform: scale(1); } 30% { filter: brightness(1.9) drop-shadow(0 0 14px rgba(255, 215, 120, .85)); transform: scale(1.35); } 100% { filter: brightness(1) drop-shadow(0 0 4px rgba(255, 215, 120, .3)); transform: scale(1); } }
+
+/* Single faint cursor glow (fine pointers only; created by core.js) */
+.e2m-cursor {
+  position: fixed; left: 0; top: 0; z-index: var(--z-fx); pointer-events: none;
+  width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 228, 160, .3), rgba(255, 200, 110, .08) 55%, transparent);
+  opacity: 0; transition: opacity .8s var(--ease-lux);
+  will-change: transform;
+}
+.e2m-cursor.is-on { opacity: 1; }
+
+/* ---------- Revision 3: temple kit life — dhvaja flags in the wind, flickering lamps, warm light on stone ---------- */
+.tk-flag { transform-box: fill-box; transform-origin: 0 50%; animation: tk-flag 3.2s ease-in-out infinite alternate; }
+@keyframes tk-flag { 0% { transform: skewY(0deg); } 50% { transform: skewY(-7deg); } 100% { transform: skewY(4deg); } }
+.tk-lamps { animation: tk-flicker-a 2.9s linear infinite; }
+.tk-lamps--1 { animation-name: tk-flicker-b; animation-duration: 3.7s; }
+.tk-lamps--2 { animation-name: tk-flicker-a; animation-duration: 4.3s; animation-direction: reverse; }
+@keyframes tk-flicker-a { 0% { opacity: .9; } 13% { opacity: .74; } 27% { opacity: .96; } 44% { opacity: .8; } 61% { opacity: 1; } 79% { opacity: .78; } 100% { opacity: .9; } }
+@keyframes tk-flicker-b { 0% { opacity: .82; } 18% { opacity: 1; } 36% { opacity: .76; } 52% { opacity: .94; } 70% { opacity: .8; } 88% { opacity: .98; } 100% { opacity: .82; } }
+.tk-spill { animation: tk-spill 5.3s ease-in-out infinite alternate; }
+@keyframes tk-spill { 0% { opacity: .62; } 30% { opacity: .78; } 55% { opacity: .66; } 100% { opacity: .84; } }
+html.is-calm .tk-flag, html.is-calm .tk-lamps, html.is-calm .tk-spill { animation: none; }
+
+/* ---------- Finale ---------- */
+.finale {
+  position: relative; min-height: 100vh; min-height: 100svh;
+  display: grid; grid-template-rows: auto 1fr; justify-items: center;
+  isolation: isolate; overflow: hidden;
+}
+/* desktop: the whole temple complex is shown at its own 8:3 proportion (no cropped towers), centred on the floor */
+.fn-palace { position: absolute; left: 50%; bottom: 0; width: min(100%, 112vh); aspect-ratio: 8 / 3; height: auto; transform: translateX(-50%); z-index: 1; pointer-events: none; }
+.fn-palace svg { width: 100%; height: 100%; }
+/* Revision 2: the palace base dissolves into the night instead of standing on a hard line above the footer */
+.fn-palace { -webkit-mask: linear-gradient(180deg, #000 86%, rgba(0, 0, 0, .4) 96%, transparent); mask: linear-gradient(180deg, #000 86%, rgba(0, 0, 0, .4) 96%, transparent); }
+.fn-floor { position: absolute; left: 50%; bottom: -2%; width: min(92vw, 980px); aspect-ratio: 1; z-index: 2; pointer-events: none; transform: translateX(-50%) scaleY(.2); transform-origin: 50% 100%; opacity: .75; }
+.fp-draw { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 2.6s var(--ease-io) var(--d, 0s); }
+.fp-lit { opacity: 0; transition: opacity 1.4s ease var(--d, 0s); }
+.fp-bulb { opacity: .08; transition: opacity .5s ease var(--d, 0s); }
+.fn-palace.is-lit .fp-draw { stroke-dashoffset: 0; }
+.fn-palace.is-lit .fp-lit { opacity: var(--o, 1); }
+.fn-palace.is-lit .fp-bulb { opacity: 1; animation: bulb-tw 2.2s ease-in-out infinite alternate; animation-delay: var(--d, 0s); }
+.fn-palace.is-instant * { transition-duration: 0s !important; transition-delay: 0s !important; }
+@keyframes bulb-tw { from { opacity: .6; } to { opacity: 1; } }
+.fn-core {
+  position: relative; z-index: 4; width: 100%;
+  display: grid; justify-items: center; align-content: start;
+  padding: clamp(3.5rem, 8vh, 6rem) var(--gutter) 0; text-align: center;
+}
+.fn-go { min-height: 60px; padding: 1.1em 3em; font-size: clamp(.68rem, .62rem + .2vw, .78rem); white-space: normal; max-width: min(calc(100vw - 40px), 560px); box-shadow: 0 0 60px rgba(255, 215, 120, .18); }
+.fn-go.is-gone { opacity: 0; transform: translateY(-8px); pointer-events: none; transition: opacity .8s var(--ease-lux), transform 1s var(--ease-out); }
+.fn-reveal { position: relative; display: grid; justify-items: center; }
+.fn-reveal::before {
+  content: ""; position: absolute; inset: -22% -18% -14%; z-index: -1; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(4, 4, 16, .86), rgba(4, 4, 16, .62) 55%, rgba(4, 4, 16, 0));
+}
+.js .fn-reveal { display: none; }
+.js .fn-reveal.is-on { display: grid; }
+.fn-go[hidden] { display: none; }
+.fn-brand { padding: 10px; margin-bottom: .6rem; }
+.fn-logo { display: block; width: clamp(48px, 4.6vw, 64px); height: auto; aspect-ratio: 1; filter: drop-shadow(0 0 22px rgba(255, 215, 120, .45)); }
+.fn-kicker { display: inline-flex; align-items: center; gap: .9em; }
+.fn-hello {
+  margin-top: clamp(1rem, 2.4vh, 1.6rem);
+  font-family: var(--font-display); font-weight: 300;
+  font-size: clamp(2.2rem, .6rem + 5.2vw, 5.8rem); line-height: 1.04;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--gold);
+  text-shadow: 0 0 1px rgba(255, 215, 120, .4), 0 4px 40px rgba(4, 4, 16, .9);
+}
+.fn-hello-line { display: block; overflow: hidden; padding: .02em .1em .06em; white-space: nowrap; }
+.fn-hello-line--2 { color: var(--ivory); }
+.fn-hello-line > span { display: inline-block; }
+.fn-thanks { margin-top: clamp(.9rem, 2.2vh, 1.4rem); max-width: 34rem; font: italic 300 clamp(1.15rem, 1rem + .55vw, 1.5rem)/1.4 var(--font-display); color: var(--ivory); text-shadow: 0 2px 20px rgba(4, 4, 16, .9); }
+.fn-replay { margin-top: clamp(1.2rem, 2.8vh, 2rem); }
+.fn-score { margin-top: .8rem; font-size: .8rem; line-height: 1.6; color: var(--ivory-60); max-width: 28rem; }
+html.finale-on .hud { opacity: .2; }
+/* While the finale is on screen the page sits above activity overlays (z 40); while it PLAYS it also sits
+   above the fx canvas (z 50), so fireworks, lanterns and confetti pass behind the palace and the headline
+   instead of over it — the type stays crisp. */
+html.finale-zone main { z-index: 42; }
+html.finale-on main { z-index: 55; }
+.fn-diya { position: absolute; left: 50%; bottom: 2%; z-index: 3; width: clamp(80px, 9vw, 130px); aspect-ratio: 64 / 40; transform: translateX(-50%); pointer-events: none; }
+.fn-diya svg { width: 100%; height: 100%; color: #A7792A; --sym-line: rgba(255, 244, 220, .7); }
+.fn-diya .e2m-flame { --fw: 20%; --fly: 50%; opacity: 0; --fs: 0; }
+.fn-diya.is-lit .e2m-flame { opacity: 1; --fs: 1.25; }
+.fn-diya-glow { position: absolute; left: 50%; bottom: 40%; width: 900%; aspect-ratio: 1; transform: translate(-50%, 50%); border-radius: 50%; opacity: 0; transition: opacity 2.4s ease; background: radial-gradient(closest-side, rgba(255, 215, 120, .42), rgba(255, 159, 50, .12) 45%, transparent); }
+.fn-diya.is-lit .fn-diya-glow { opacity: 1; }
+@media (max-width: 760px) {
+  .fn-palace { left: 0; width: 100%; height: 34%; aspect-ratio: auto; transform: none; }
+  .fn-core { padding-top: 4.5rem; }
+  .fn-hello { letter-spacing: .05em; }
+}
+
+/* ---------- Footer ---------- */
+.site-foot { text-align: center; padding: 9rem var(--gutter) 4rem; overflow: hidden; background: linear-gradient(180deg, transparent, rgba(4, 4, 16, .94) 45%); }
+.foot-mark { display: flex; justify-content: center; }
+.foot-mark img { width: clamp(120px, 18vw, 220px); height: auto; aspect-ratio: 1; opacity: .12; user-select: none; }
+.foot-line { margin-top: 2.2rem; font: italic 300 var(--fs-lg)/1.2 var(--font-display); color: var(--gold); }
+.foot-small { margin-top: 1rem; font-size: .86rem; color: var(--ivory-72); padding-bottom: var(--safe-bottom); }
+.foot-small a { color: var(--ivory-80); display: inline-block; min-height: 24px; }
+.foot-small a:hover { color: var(--gold); }
+
+/* Gold flash used by the gate transition */
+.gold-flash.is-on { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .w-lantern svg, .sky-stars .tw, .hidden-diya::after { animation: none; }
+  .e2m-cursor { display: none; }
+}
+/* Toolkit Calm: ambient decoration holds still, interaction feedback stays */
+html.is-calm .w-lantern svg, html.is-calm .sky-stars .tw, html.is-calm .hidden-diya::after { animation: none; }
+html.is-calm .e2m-cursor { display: none; }
+
+/* ---------- Revision 3: near background shells rim-light the temple town at the gate ---------- */
+.op-rim {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 72%; z-index: 2; pointer-events: none; opacity: 0;
+  background: radial-gradient(46% 52% at var(--fx, 50%) 40%, var(--fc, #FFD778), transparent 72%);
+  -webkit-mask: linear-gradient(180deg, transparent, #000 34%, #000 86%, transparent); mask: linear-gradient(180deg, transparent, #000 34%, #000 86%, transparent);
+  mix-blend-mode: soft-light;
+}
+html.is-contrast .op-rim { display: none; }
+.sky-stars { will-change: transform; }
+.act-fireworks .fw-guide.is-gone *, .act-fireworks .fw-guide.is-gone { animation: none !important; }
+
+/* Revision 6: keep legacy micro-label rules from shrinking anything below the new floor */
+.hud-found-num b { font-weight: 400; }

@@ -1,0 +1,134 @@
+/* Activity X — Wish Card Studio (scoped to .act-wish). Revision 2. One hairline frame, light serif, tracked caps. */
+.act-wish { position: relative; padding: 0 var(--gutter) clamp(4rem, 8vw, 7rem); }
+.act-wish .wc-grid {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr); gap: clamp(2rem, 5vw, 5rem);
+  align-items: start; max-width: 1180px; margin: 0 auto;
+}
+
+/* the preview: the card sits in a single arch-less hairline frame, lit from below like a desk lamp */
+.act-wish .wc-preview { position: sticky; top: calc(var(--hud-h) + 24px); margin: 0; }
+.act-wish .wc-frame {
+  position: relative; padding: clamp(10px, 1.4vw, 16px);
+  border: var(--hair-w) solid var(--gold-hair-soft);
+  background: radial-gradient(80% 60% at 50% 100%, rgba(255, 170, 80, .08), transparent 70%);
+}
+.act-wish .wc-frame::after { content: ""; position: absolute; inset: 5px; border: 1px solid rgba(255, 215, 120, .08); pointer-events: none; }
+.act-wish .wc-canvas {
+  display: block; width: 100%; height: auto; aspect-ratio: 1080 / 1350;
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .7), 0 0 0 1px rgba(255, 215, 120, .06);
+  transition: transform .9s var(--ease-out);
+}
+.act-wish .wc-cap { margin-top: .9rem; text-align: center; color: var(--ivory-72); }
+
+/* the form */
+.act-wish .wc-form { display: grid; gap: 2rem; }
+.act-wish .wc-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem 1.4rem; }
+.act-wish .wc-field { display: grid; gap: .5rem; align-content: start; }
+.act-wish .wc-field label { color: var(--gold-text); }
+.act-wish .wc-opt { text-transform: none; letter-spacing: .04em; color: var(--ivory-72); }
+.act-wish .wc-input {
+  width: 100%; min-height: 50px; padding: .7rem 0 .55rem;
+  border: 0; border-bottom: var(--hair-w) solid var(--gold-hair); border-radius: 0; background: transparent;
+  color: var(--ivory); font: italic 300 1.45rem/1.3 var(--font-display); letter-spacing: .01em;
+  transition: border-color .5s var(--ease-lux);
+}
+.act-wish .wc-input::placeholder { color: var(--ivory-72); opacity: 1; }
+.act-wish .wc-input:hover { border-bottom-color: var(--gold); }
+.act-wish .wc-input:focus-visible { outline: var(--focus-ring); outline-offset: 4px; border-bottom-color: var(--gold); }
+.act-wish .wc-help { font-size: .82rem; line-height: 1.5; color: var(--ivory-72); }
+.act-wish .wc-set { margin: 0; padding: 0; border: 0; min-width: 0; }
+.act-wish .wc-set legend { padding: 0; margin-bottom: .9rem; color: var(--gold-text); }
+
+.act-wish .wc-wishes { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-top: 1px solid rgba(255, 215, 120, .12); }
+.act-wish .wc-wish {
+  position: relative; display: flex; align-items: center; gap: .9rem; min-height: 60px; padding: .75rem .9rem .75rem 1.6rem; text-align: left;
+  border: 0; border-bottom: 1px solid rgba(255, 215, 120, .12); background: none; color: var(--ivory-80);
+  font: 300 .96rem/1.45 var(--font-ui); letter-spacing: .005em;
+  transition: color .5s var(--ease-lux), background-color .5s var(--ease-lux);
+}
+.act-wish .wc-wish:nth-child(odd) { border-right: 1px solid rgba(255, 215, 120, .12); }
+.act-wish .wc-wish::before {
+  content: ""; position: absolute; left: .4rem; top: 50%; width: 7px; height: 7px; margin-top: -3.5px;
+  border: 1px solid var(--gold-hair); transform: rotate(45deg); transition: background-color .5s, border-color .5s;
+}
+.act-wish .wc-wish:hover { color: var(--ivory); background: rgba(255, 215, 120, .04); }
+.act-wish .wc-wish[aria-checked="true"] { color: var(--ivory); background: rgba(255, 215, 120, .07); }
+.act-wish .wc-wish[aria-checked="true"]::before { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 8px rgba(255, 215, 120, .55); }
+.act-wish .wc-wish:focus-visible { outline-offset: -3px; z-index: 1; }
+.act-wish .wc-wish--own i { font: italic 300 1.15rem/1.2 var(--font-display); color: var(--gold); }
+.act-wish .wc-own { margin-top: 1rem; }
+.act-wish .wc-own[hidden] { display: none; }
+.act-wish .wc-textarea { resize: vertical; min-height: 84px; font-size: 1.3rem; }
+.act-wish .wc-count { margin-top: .35rem; text-align: right; font-size: .82rem; color: var(--ivory-72); letter-spacing: .1em; }
+.act-wish .wc-count b { font-weight: 400; color: var(--gold); }
+
+.act-wish .wc-styles { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; }
+.act-wish .wc-style {
+  display: grid; justify-items: center; gap: .7rem; padding: .8rem .5rem 1rem; min-height: 44px;
+  border: var(--hair-w) solid var(--gold-hair-soft); background: none; color: var(--ivory-80);
+  font: 400 var(--fs-micro)/1.3 var(--font-ui); letter-spacing: .14em; text-transform: uppercase;
+  transition: border-color .5s var(--ease-lux), color .5s var(--ease-lux);
+}
+.act-wish .wc-style:hover { color: var(--ivory); border-color: var(--gold-hair); }
+.act-wish .wc-style[aria-checked="true"] { border-color: var(--gold); color: var(--gold); }
+.act-wish .wc-swatch { position: relative; width: 100%; max-width: 92px; aspect-ratio: 4 / 5; }
+.act-wish .wc-swatch::after { content: ""; position: absolute; inset: 7px; border: 1px solid currentColor; opacity: .7; }
+.act-wish .wc-style--midnight .wc-swatch { background: radial-gradient(circle at 50% 42%, #0E1233, #04050F); color: #FFD778; }
+.act-wish .wc-style--plum .wc-swatch { background: radial-gradient(circle at 50% 42%, #FFF8E8, #F1DFBE); color: #8A5A12; }
+.act-wish .wc-style--mandala .wc-swatch {
+  color: #FFD778;
+  background:
+    radial-gradient(circle at 50% 47%, transparent 0 22%, rgba(255, 215, 120, .45) 22.5% 23.5%, transparent 24% 36%, rgba(255, 215, 120, .3) 36.5% 37.5%, transparent 38%),
+    radial-gradient(circle at 50% 42%, #2A1450, #0E0620);
+}
+
+.act-wish .wc-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .8rem 1rem; padding-top: .4rem; }
+.act-wish .wc-diya[aria-pressed="true"] { color: var(--gold); }
+
+@media (max-width: 900px) {
+  .act-wish .wc-grid { grid-template-columns: 1fr; }
+  .act-wish .wc-preview { position: relative; top: 0; width: min(100%, 440px); margin: 0 auto; }
+}
+@media (max-width: 560px) {
+  .act-wish .wc-fields { grid-template-columns: 1fr; }
+  .act-wish .wc-wishes { grid-template-columns: 1fr; }
+  .act-wish .wc-wish:nth-child(odd) { border-right: 0; }
+  .act-wish .wc-styles { gap: .5rem; }
+  .act-wish .wc-style { letter-spacing: .08em; padding-inline: .3rem; }
+  .act-wish .wc-actions .btn-diya, .act-wish .wc-actions .btn-marigold { flex: 1 1 100%; }
+}
+
+/* =====================================================================
+   Revision 6 — scribe's desk in Mukta / Yatra One, marigold-dot choices, festive actions
+   ===================================================================== */
+.act-wish .wc-lab { font: 400 var(--fs-btn)/1.3 var(--font-accent); letter-spacing: .01em; color: var(--marigold-text); }
+.act-wish .wc-field label { color: var(--marigold-text); }
+.act-wish .wc-opt { font: 500 var(--fs-ui)/1 var(--font-body); letter-spacing: 0; color: var(--ivory-80); }
+.act-wish .wc-cap { font: 500 var(--fs-ui)/1.5 var(--font-body); letter-spacing: 0; text-transform: none; color: var(--ivory-80); }
+.act-wish .wc-help { font-size: var(--fs-ui); line-height: 1.55; color: var(--ivory-80); }
+.act-wish .wc-input { font: italic 400 clamp(1.6rem, 1.3rem + .8vw, 1.95rem)/1.3 var(--font-display); border-bottom-width: 2px; border-bottom-color: rgba(255, 181, 46, .5); }
+.act-wish .wc-input:hover, .act-wish .wc-input:focus-visible { border-bottom-color: var(--marigold); }
+.act-wish .wc-textarea { font-size: clamp(1.45rem, 1.2rem + .6vw, 1.7rem); }
+.act-wish .wc-count { font: 500 var(--fs-ui)/1 var(--font-body); letter-spacing: 0; color: var(--ivory-80); }
+.act-wish .wc-count b { color: var(--haldi); }
+.act-wish .wc-wishes { border-top: 0; gap: 6px; padding: 5px; border-radius: 14px; background: rgba(5, 6, 20, .5); box-shadow: inset 0 0 0 1px rgba(255, 181, 46, .22); }
+.act-wish .wc-wish {
+  min-height: 64px; padding: .7rem 1rem .7rem 2.7rem; border: 0; border-radius: 10px;
+  font: 400 var(--fs-ui)/1.4 var(--font-body); letter-spacing: 0; color: var(--ivory);
+}
+.act-wish .wc-wish:nth-child(odd) { border-right: 0; }
+.act-wish .wc-wish::before { left: 1rem; width: 13px; height: 13px; margin-top: -6.5px; border: 0; border-radius: 50%; transform: none; box-shadow: inset 0 0 0 1.5px rgba(255, 181, 46, .7); }
+.act-wish .wc-wish:hover { background: rgba(255, 181, 46, .08); }
+.act-wish .wc-wish[aria-checked="true"] { background: rgba(255, 181, 46, .15); box-shadow: inset 0 0 0 1.5px rgba(255, 190, 85, .65); }
+.act-wish .wc-wish[aria-checked="true"]::before { border: 0; background: radial-gradient(circle, #A84806 0 22%, var(--haldi) 30% 52%, var(--marigold-deep) 62%); box-shadow: 0 0 0 1.5px rgba(255, 210, 74, .9), 0 0 9px 1px rgba(255, 170, 50, .6); }
+.act-wish .wc-wish--own i { font: italic 400 1.3rem/1.2 var(--font-display); color: var(--marigold-text); }
+.act-wish .wc-style {
+  border: 0; border-radius: 14px; padding: .9rem .5rem 1rem; gap: .8rem;
+  background: rgba(5, 6, 20, .5); box-shadow: inset 0 0 0 1px rgba(255, 181, 46, .22);
+  font: 600 var(--fs-ui)/1.3 var(--font-body); letter-spacing: 0; text-transform: none; color: var(--ivory);
+}
+.act-wish .wc-style:hover { box-shadow: inset 0 0 0 1.5px rgba(255, 190, 85, .6); }
+.act-wish .wc-style[aria-checked="true"] { color: var(--haldi); box-shadow: inset 0 0 0 2px var(--marigold), 0 0 18px -4px rgba(255, 170, 50, .5); }
+.act-wish .wc-frame { border: 0; box-shadow: inset 0 0 0 1.5px rgba(217, 164, 65, .45); }
+.act-wish .wc-actions { gap: 1.2rem 1.4rem; padding-top: 1.6rem; }
+@media (max-width: 560px) { .act-wish .wc-style { letter-spacing: 0; } .act-wish .wc-wish { padding-left: 2.6rem; } }

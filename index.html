@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>E2M Diwali — The Festival of Lights</title>
+<meta name="description" content="E2M Diwali: an interactive festival playground. Launch fireworks, light diyas, draw rangoli, write a wish card and celebrate together. One Team. A Thousand Lights.">
+<meta name="theme-color" content="#080B1E">
+<script>
+  (function (h) {
+    h.className = h.className.replace('no-js', 'js') + ' has-opening';
+    // Safety net: never leave the page scroll-locked if the world script fails.
+    window.addEventListener('load', function () {
+      setTimeout(function () { if (!window.E2M || !window.E2M.worldReady) h.classList.remove('has-opening'); }, 6000);
+    });
+  })(document.documentElement);
+</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23080B1E'/%3E%3Cpath d='M32 10c-6 9-7 15-4 20 1 2 3 3 4 3s3-1 4-3c3-5 2-11-4-20z' fill='%23FFD778'/%3E%3Cpath d='M8 36c8 0 40 0 48-2-2 10-10 18-24 18S10 46 8 36z' fill='%23E8641A'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Mukta:wght@400;500;600;700&family=Yatra+One&family=Noto+Sans+Devanagari:wght@400;600&display=swap">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/world.css">
+<link rel="stylesheet" href="css/zones.css">
+<link rel="stylesheet" href="css/festive-tiles.css">
+<link rel="stylesheet" href="css/festive.css">
+<link rel="stylesheet" href="css/act-fireworks.css">
+<link rel="stylesheet" href="css/act-diyas.css">
+<link rel="stylesheet" href="css/act-rangoli.css">
+<link rel="stylesheet" href="css/act-laddoo.css">
+<link rel="stylesheet" href="css/act-lanterns.css">
+<link rel="stylesheet" href="css/act-chakri.css">
+<link rel="stylesheet" href="css/act-gifts.css">
+<link rel="stylesheet" href="css/act-mood.css">
+<link rel="stylesheet" href="css/act-wish.css">
+<link rel="stylesheet" href="css/toolkit.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script defer src="js/core.js"></script>
+<script defer src="js/toolkit.js"></script>
+<script defer src="js/act-fireworks.js"></script>
+<script defer src="js/act-diyas.js"></script>
+<script defer src="js/act-rangoli.js"></script>
+<script defer src="js/act-laddoo.js"></script>
+<script defer src="js/act-lanterns.js"></script>
+<script defer src="js/act-chakri.js"></script>
+<script defer src="js/act-gifts.js"></script>
+<script defer src="js/act-mood.js"></script>
+<script defer src="js/act-wish.js"></script>
+<script defer src="js/world.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#world">Skip to the celebration</a>
+
+<!-- ============ Shared gold-hairline ornament sprite ============ -->
+<svg class="sprite" aria-hidden="true" focusable="false" width="0" height="0">
+  <defs>
+    <radialGradient id="g-warm" cx="50%" cy="55%" r="60%">
+      <stop offset="0" stop-color="#FFF4DC"/>
+      <stop offset=".35" stop-color="#FFD778"/>
+      <stop offset=".75" stop-color="#FF9F32"/>
+      <stop offset="1" stop-color="#E8641A"/>
+    </radialGradient>
+    <linearGradient id="g-clay" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#C8642C"/>
+      <stop offset=".55" stop-color="#9A4119"/>
+      <stop offset="1" stop-color="#5E220C"/>
+    </linearGradient>
+    <linearGradient id="g-brass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFE7A3"/>
+      <stop offset=".45" stop-color="#D9A441"/>
+      <stop offset="1" stop-color="#8A5A12"/>
+    </linearGradient>
+  </defs>
+  <symbol id="i-star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c.9 7.2 4 10.6 12 12-8 1.4-11.1 4.8-12 12-.9-7.2-4-10.6-12-12 8-1.4 11.1-4.8 12-12z"/></symbol>
+  <symbol id="i-lotus" viewBox="0 0 64 40"><g fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"><path d="M32 3c-6 10-6 22 0 31 6-9 6-21 0-31z"/><path d="M32 34C22 30 16 20 16 9c8 4 14 13 16 25z"/><path d="M32 34c10-4 16-14 16-25-8 4-14 13-16 25z"/><path d="M32 36C18 36 8 28 3 17c11 2 21 9 29 19z"/><path d="M32 36c14 0 24-8 29-19-11 2-21 9-29 19z"/><path d="M12 38.5h40"/></g></symbol>
+  <symbol id="i-paisley" viewBox="0 0 40 64"><g fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M20 61C6 57 1 41 7 28 13 16 30 13 32 2c6 12 6 28 0 40-4 10-8 16-12 19z"/><path d="M20 51c-8-4-8-14-2-20 6-6 12-6 12-14"/><circle cx="19" cy="41" r="3.2"/></g><g fill="currentColor"><circle cx="11" cy="22" r="1.1"/><circle cx="8" cy="33" r="1.1"/><circle cx="10" cy="45" r="1.1"/><circle cx="35" cy="22" r="1.1"/></g></symbol>
+  <symbol id="i-jaali" viewBox="0 0 40 40"><g fill="none" stroke="currentColor" stroke-width="1"><path d="M20 1l5.6 13.4L39 20l-13.4 5.6L20 39l-5.6-13.4L1 20l13.4-5.6z"/><path d="M6.6 6.6h26.8v26.8H6.6z"/><circle cx="20" cy="20" r="5"/></g></symbol>
+  <symbol id="i-diya" viewBox="0 0 64 40"><path fill="currentColor" d="M3 15.5c9 .8 21 1.2 30 1.1 10-.1 20-1.1 28-4.1-1.8 8.6-8.8 18.5-23 21.4h-12C13 31.3 5.6 24.6 3 15.5z"/><path fill="currentColor" opacity=".8" d="M25 33.9h14l-2 4.6H27z"/><path fill="none" stroke="var(--sym-line, rgba(255,215,120,.7))" stroke-width="1" d="M5.5 18.3c8 1 19.6 1.5 27.5 1.4 9-.1 17.5-1 24.6-3.2"/></symbol>
+  <!-- Revision 3: Hindu temple vocabulary (the old cusped arch is now a corbelled temple-niche torana) -->
+  <symbol id="i-arch" viewBox="0 0 40 56"><g fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"><path d="M4 56V22h32v34"/><path d="M4 22h-2.5v-3.5h37V22H36"/><path d="M9 18.5C9 10 14 5 20 2c6 3 11 8 11 16.5"/><path d="M12 12.5h16M14.5 8h11"/><path d="M20 2V0"/><path d="M9 56V27h22v29"/></g></symbol>
+  <symbol id="i-shikhara" viewBox="0 0 40 64"><g fill="currentColor"><path d="M4 64V54C4 34 10 22 15 16h10c5 6 11 18 11 38v10z"/><ellipse cx="20" cy="13.4" rx="7.4" ry="2.4"/><circle cx="20" cy="8.6" r="2.4"/><path d="M18.9 6.6L20 1.6l1.1 5z"/></g><path fill="none" stroke="var(--sym-line, rgba(8,11,30,.5))" stroke-width=".8" d="M6 54h28M7.4 46h25.2M9.4 38h21.2M11.8 30h16.4M14.2 23h11.6M17 64v-8h6v8"/></symbol>
+  <symbol id="i-kalasha" viewBox="0 0 32 40"><g fill="currentColor"><ellipse cx="16" cy="36.5" rx="9" ry="2.6"/><path d="M7 26c0-6 4-9 9-9s9 3 9 9-4 9-9 9-9-3-9-9z"/><rect x="12.4" y="13.4" width="7.2" height="4"/><path d="M8 13.6c3-1.4 5-5 8-11 3 6 5 9.6 8 11z"/></g><path fill="none" stroke="var(--sym-line, rgba(8,11,30,.45))" stroke-width=".8" d="M8.6 24h14.8M9 28.4h14"/></symbol>
+  <symbol id="i-deepmala" viewBox="0 0 24 64"><g fill="currentColor"><path d="M9 60l1.6-50h2.8L15 60z"/><rect x="4" y="60" width="16" height="4"/><rect x="8.4" y="6.6" width="7.2" height="3"/><path d="M10.6 6.6L12 1l1.4 5.6z"/></g><g fill="var(--sym-flame, #FFD778)"><circle cx="5.4" cy="18" r="1.3"/><circle cx="18.6" cy="18" r="1.3"/><circle cx="5" cy="28" r="1.3"/><circle cx="19" cy="28" r="1.3"/><circle cx="4.6" cy="38" r="1.3"/><circle cx="19.4" cy="38" r="1.3"/><circle cx="4.2" cy="48" r="1.3"/><circle cx="19.8" cy="48" r="1.3"/></g><path fill="none" stroke="currentColor" stroke-width="1" d="M6 19.6h12M5.6 29.6h12.8M5.2 39.6h13.6M4.8 49.6h14.4"/></symbol>
+  <symbol id="i-torana" viewBox="0 0 64 56"><g fill="currentColor"><rect x="10" y="14" width="5" height="42"/><rect x="49" y="14" width="5" height="42"/><rect x="4" y="12" width="56" height="3.4"/><rect x="6" y="5.6" width="52" height="3.4"/><circle cx="4" cy="13.7" r="2.4"/><circle cx="60" cy="13.7" r="2.4"/><circle cx="6" cy="7.3" r="2.2"/><circle cx="58" cy="7.3" r="2.2"/><rect x="30" y="9" width="4" height="3"/><path d="M29.4 5.6L32 .6l2.6 5z"/></g></symbol>
+  <symbol id="i-gopuram" viewBox="0 0 48 64"><g fill="currentColor"><path d="M4 64V42h40v22z"/><path d="M6 42l3-8h30l3 8z"/><path d="M10 34l3-8h22l3 8z"/><path d="M14 26l3-8h14l3 8z"/><path d="M17 18c0-4 3-6 7-6s7 2 7 6z"/><path d="M19 12l1-3 1 3zM23 11l1-4 1 4zM27 12l1-3 1 3z"/></g><path fill="none" stroke="var(--sym-line, rgba(8,11,30,.5))" stroke-width=".8" d="M19.6 64V50h8.8v14M6 42h36M10 34h28M14 26h20"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 32 46"><g fill="currentColor"><path d="M16 9.5C9.4 9.5 7.3 17 7.3 24.5c0 5.6-1.6 8.6-4.3 10.8h26c-2.7-2.2-4.3-5.2-4.3-10.8C24.7 17 22.6 9.5 16 9.5z"/><rect x="2" y="35" width="28" height="3.4" rx="1.2"/><circle cx="16" cy="42.2" r="2.8"/><rect x="14.6" y="5.6" width="2.8" height="4.6"/></g><circle cx="16" cy="3.6" r="2.6" fill="none" stroke="currentColor" stroke-width="1.4"/><path fill="none" stroke="var(--sym-line, rgba(8,11,30,.45))" stroke-width="1" d="M9 22.5h14M8.4 28h15.2"/></symbol>
+  <symbol id="i-marigold" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="12" cy="4.6" r="4"/><circle cx="17.2" cy="6.8" r="4"/><circle cx="19.4" cy="12" r="4"/><circle cx="17.2" cy="17.2" r="4"/><circle cx="12" cy="19.4" r="4"/><circle cx="6.8" cy="17.2" r="4"/><circle cx="4.6" cy="12" r="4"/><circle cx="6.8" cy="6.8" r="4"/></g><g fill="var(--sym-core, #FFB52E)"><circle cx="12" cy="8.6" r="2.6"/><circle cx="15.4" cy="12" r="2.6"/><circle cx="12" cy="15.4" r="2.6"/><circle cx="8.6" cy="12" r="2.6"/></g><circle cx="12" cy="12" r="2.2" fill="var(--sym-eye, #B8520C)"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 20 40"><path fill="currentColor" d="M10 0c7 9 9 20 4 32-1.6 3.6-3 6-4 8-1-2-2.4-4.4-4-8C1 20 3 9 10 0z"/><path fill="none" stroke="rgba(8,11,30,.35)" stroke-width=".8" d="M10 3v34"/></symbol>
+  <symbol id="i-kandil" viewBox="0 0 60 112"><path d="M30 0v12" stroke="#FFD778" stroke-width="1.2"/><path fill="url(#g-brass)" d="M22 12h16l-3 5H25z"/><path fill="var(--k-paper, #FF9F32)" d="M30 17l19 15-4 26-15 11-15-11-4-26z"/><path fill="var(--k-paper-2, #DB59C8)" d="M30 17l7 15-7 37-7-37z" opacity=".75"/><path fill="none" stroke="#FFD778" stroke-width="1.1" stroke-linejoin="round" d="M30 17l19 15-4 26-15 11-15-11-4-26zM11 32h38M15 58h30M30 17v52"/><path fill="var(--k-paper-2, #DB59C8)" d="M22 69h16l-2 6H24z"/><g stroke="var(--k-tassel, #FFD778)" stroke-width="1.2" stroke-linecap="round"><path d="M24 75v26M28 75v32M32 75v32M36 75v26"/></g><g fill="#FFD778"><circle cx="24" cy="102" r="1.6"/><circle cx="28" cy="108" r="1.6"/><circle cx="32" cy="108" r="1.6"/><circle cx="36" cy="102" r="1.6"/></g></symbol>
+  <symbol id="i-tools" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></g></symbol>
+  <symbol id="i-sound" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path style="opacity:var(--s-wave,0)" d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/><path style="opacity:var(--s-mute,1)" d="M16 9.5l5 5M21 9.5l-5 5"/></g></symbol>
+</svg>
+
+<!-- ============ Revision 4: one continuous deep-space backdrop (fixed, behind everything) ============ -->
+<div class="sky" aria-hidden="true">
+  <div class="sky-nebula"></div>
+  <svg class="sky-stars sky-stars--far" data-depth="far" preserveAspectRatio="none" focusable="false"></svg>
+  <svg class="sky-stars sky-stars--mid" data-depth="mid" preserveAspectRatio="none" focusable="false"></svg>
+  <svg class="sky-stars sky-stars--near" data-depth="near" preserveAspectRatio="none" focusable="false"></svg>
+</div>
+
+<!-- ============ HUD ============ -->
+<header class="hud" id="hud">
+  <a class="hud-brand" href="#opening" aria-label="E2M, back to the temple gate">
+    <img class="hud-logo" src="assets/e2m-logo-white.svg" alt="E2M" width="64" height="64" decoding="async">
+  </a>
+  <nav class="hud-nav" aria-label="Festival zones">
+    <button class="hud-map" type="button" aria-expanded="false" aria-controls="hud-zones"><span>Zones</span></button>
+    <div class="hud-track">
+      <span class="hud-line" aria-hidden="true"><i class="hud-marker"></i></span>
+      <ol class="hud-zones" id="hud-zones">
+        <li><a href="#zone-fireworks" data-dot="fireworks"><span class="dot-label"><b>I</b> Fireworks</span></a></li>
+        <li><a href="#zone-diyas" data-dot="diyas"><span class="dot-label"><b>II</b> Lakshmi Diya</span></a></li>
+        <li><a href="#zone-rangoli" data-dot="rangoli"><span class="dot-label"><b>III</b> Rangoli</span></a></li>
+        <li><a href="#zone-laddoo" data-dot="laddoo"><span class="dot-label"><b>IV</b> Laddoo</span></a></li>
+        <li><a href="#zone-lanterns" data-dot="lanterns"><span class="dot-label"><b>V</b> Lanterns</span></a></li>
+        <li><a href="#zone-chakri" data-dot="chakri"><span class="dot-label"><b>VI</b> Chakri</span></a></li>
+        <li><a href="#zone-gifts" data-dot="gifts"><span class="dot-label"><b>VII</b> Gifts</span></a></li>
+        <li><a href="#zone-mood" data-dot="mood"><span class="dot-label"><b>VIII</b> Mood Oracle</span></a></li>
+        <li><a href="#zone-wish" data-dot="wish"><span class="dot-label"><b>IX</b> Wish Cards</span></a></li>
+        <li><a href="#zone-finale" data-dot="finale"><span class="dot-label"><b>X</b> Finale</span></a></li>
+      </ol>
+    </div>
+  </nav>
+  <div class="hud-right">
+    <p class="hud-found" title="Hidden diyas found" aria-live="polite">
+      <i class="hud-found-mark" aria-hidden="true"></i>
+      <span class="hud-found-num"><b data-found-count>0</b>/7</span>
+      <span class="sr-only">hidden diyas found</span>
+    </p>
+    <button class="hud-sound" type="button" aria-pressed="false" data-sound-toggle>
+      <svg aria-hidden="true" viewBox="0 0 32 46"><use href="#i-bell"/></svg>
+      <span class="hud-sound-label" data-sound-label>Sound off</span>
+    </button>
+    <button class="hud-tools" type="button" aria-expanded="false" aria-controls="e2m-toolkit" aria-haspopup="dialog" aria-keyshortcuts="T">
+      <svg aria-hidden="true" viewBox="0 0 64 40"><use href="#i-diya"/></svg>
+      <span class="hud-tools-label">Tools</span>
+    </button>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ OPENING: the temple gate (gopuram dwar with a torana) ============ -->
+<section class="opening" id="opening" data-section-id="opening" aria-labelledby="opening-title">
+  <!-- the temple town around the gate: prakara walls with diya niches, shikharas, deepmala lamp towers (world.js) -->
+  <div class="op-facade" aria-hidden="true">
+    <svg class="op-facade-art" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" focusable="false"></svg>
+    <svg class="op-facade-live" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" focusable="false"></svg>
+  </div>
+
+  <!-- the one garland on the page: a restrained toran over the temple entrance -->
+  <div class="op-toran" data-garland="toran" aria-hidden="true"></div>
+
+  <div class="gate" aria-hidden="true">
+    <!-- the gopuram: tiered gateway tower, kalasha crown, carved door frame and makara torana (world.js) -->
+    <svg class="gopuram" viewBox="0 0 100 140" preserveAspectRatio="xMidYMax meet" focusable="false"></svg>
+    <div class="arch-portal">
+      <div class="portal-light"></div>
+      <div class="portal-seam"></div>
+      <div class="door door--l"><span class="door-panel door-panel--top"></span><span class="door-panel door-panel--bot"></span><span class="door-ring"></span></div>
+      <div class="door door--r"><span class="door-panel door-panel--top"></span><span class="door-panel door-panel--bot"></span><span class="door-ring"></span></div>
+    </div>
+    <svg class="arch-line" viewBox="0 0 40 58" preserveAspectRatio="none" focusable="false">
+      <path class="arch-path" pathLength="1" d="M0 58V5H2V2.5H4.5V0H35.5V2.5H38V5H40V58" fill="none" stroke="#FFD778" stroke-width="1" vector-effect="non-scaling-stroke"/>
+    </svg>
+    <span class="gate-bell gate-bell--l"><svg><use href="#i-bell"/></svg></span>
+    <span class="gate-bell gate-bell--r"><svg><use href="#i-bell"/></svg></span>
+    <div class="threshold">
+      <div class="steps"><i></i><i></i><i></i></div>
+      <ul class="th-diyas">
+        <li class="th-diya"><svg><use href="#i-diya"/></svg><span class="e2m-flame"><i></i></span></li>
+        <li class="th-diya"><svg><use href="#i-diya"/></svg><span class="e2m-flame"><i></i></span></li>
+        <li class="th-gap"></li>
+        <li class="th-diya"><svg><use href="#i-diya"/></svg><span class="e2m-flame"><i></i></span></li>
+        <li class="th-diya"><svg><use href="#i-diya"/></svg><span class="e2m-flame"><i></i></span></li>
+      </ul>
+      <div class="central-diya">
+        <span class="cd-glow"></span>
+        <svg class="cd-body" viewBox="0 0 64 40"><use href="#i-diya"/></svg>
+        <span class="e2m-flame cd-flame"><i></i></span>
+      </div>
+    </div>
+  </div>
+
+  <canvas class="op-motes" aria-hidden="true"></canvas>
+
+  <div class="opening-copy">
+    <p class="op-brand"><img class="op-logo" src="assets/e2m-logo-white.svg" alt="E2M" width="64" height="64" decoding="async"></p>
+    <p class="op-eyebrow label-caps">Presents <span class="op-dot" aria-hidden="true"></span> Diwali 2026</p>
+    <h1 class="op-title" id="opening-title"><span class="op-line">The Festival</span> <span class="op-line op-line--2">of Lights</span></h1>
+    <p class="op-sub">One Team. A Thousand Lights.</p>
+    <p class="op-deva" lang="hi"><span class="deva-stamp">शुभ दीपावली</span></p>
+    <p class="op-copy">Forget the deadlines for a moment. It's time to celebrate, play and light up the night!</p>
+    <div class="op-actions">
+      <button class="btn-diya btn-diya--lg op-cta" type="button"><span>Enter the celebration</span></button>
+      <button class="op-sound" type="button" aria-pressed="false" data-sound-toggle>
+        <svg aria-hidden="true" viewBox="0 0 32 46"><use href="#i-bell"/></svg><span data-sound-label>Sound off</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<div class="world" id="world" tabindex="-1">
+
+<!-- ============ I FIREWORKS ============ -->
+<section class="zone zone--fireworks" id="zone-fireworks" data-zone="fireworks" data-section-id="zone-fireworks" aria-labelledby="t-fireworks">
+  <div class="zone-scenery" aria-hidden="true">
+  </div>
+  <header class="zone-head zh--fireworks">
+    <h2 class="zh-title" id="t-fireworks" data-split>Fireworks <em>Playground</em></h2>
+    <p class="zh-line" data-reveal><span data-input="mouse">Click</span><span data-input="touch">Tap</span> anywhere to launch. Hold to send it higher. <span data-input="mouse">Double-click</span><span data-input="touch">Double-tap</span> for something the neighbours will mention.</p>
+    <p class="zh-hint" data-hint><span class="zh-hint-mark" aria-hidden="true"></span><span class="sr-only">How to play: </span>Keyboard: Enter launches · hold Space to charge · Shift + Enter for a big one · Esc stops the night show</p>
+  </header>
+  <div class="zone-stage" data-mount="fireworks"></div>
+  <p class="scroll-cue" aria-hidden="true"><span>Scroll to explore</span><i></i></p>
+</section>
+
+<div class="seam seam--diyas" aria-hidden="true"></div>
+
+<!-- ============ II DIYAS ============ -->
+<section class="zone zone--diyas" id="zone-diyas" data-zone="diyas" data-section-id="zone-diyas" aria-labelledby="t-diyas">
+  <div class="zone-scenery" aria-hidden="true">
+    <div class="zs-arcade" data-parallax="0.08"></div>
+    <div class="zs-floor"></div>
+  </div>
+  <header class="zone-head zh--diyas">
+    <button class="bell" type="button" style="--bx:12%" data-pitch="560" aria-label="Ring the temple bell"><svg aria-hidden="true"><use href="#i-bell"/></svg></button>
+    <button class="hidden-diya" type="button" data-hid="hd1" style="--hx:86%;--hy:12%" aria-label="Something glints in the courtyard"><svg aria-hidden="true"><use href="#i-diya"/></svg><span class="e2m-flame"><i></i></span></button>
+    <h2 class="zh-title" id="t-diyas" data-split>Light Up the <em>Diya</em></h2>
+    <p class="zh-line" data-reveal>One brass diya, one goddess of good fortune, zero fire-safety briefing. Light it and let the blessings glow.</p>
+    <p class="zh-hint" data-hint><span class="zh-hint-mark" aria-hidden="true"></span><span><span class="sr-only">How to play: </span><span data-input="mouse">Click</span><span data-input="touch">Tap</span> the diya in front of Lakshmi · or press Light the diya</span></p>
+  </header>
+  <div class="zone-stage" data-mount="diyas"></div>
+</section>
+
+<div class="seam seam--toran" aria-hidden="true"></div>
+
+<!-- ============ III RANGOLI ============ -->
+<section class="zone zone--rangoli" id="zone-rangoli" data-zone="rangoli" data-section-id="zone-rangoli" aria-labelledby="t-rangoli">
+  <div class="zone-scenery" aria-hidden="true">
+    <svg class="zs-compass" viewBox="0 0 400 400" data-parallax="-0.1">
+      <g fill="none" stroke="#FFF4DC" stroke-opacity=".07" stroke-width=".6"><circle cx="200" cy="200" r="190"/><circle cx="200" cy="200" r="140" stroke-dasharray="2 7"/><circle cx="200" cy="200" r="90"/><path d="M200 0v400M0 200h400M58 58l284 284M342 58L58 342"/></g>
+    </svg>
+  </div>
+  <header class="zone-head zh--rangoli zh--left">
+    <button class="hidden-diya" type="button" data-hid="hd2" style="--hx:7%;--hy:70%" aria-label="Something glints on the drafting floor"><svg aria-hidden="true"><use href="#i-diya"/></svg><span class="e2m-flame"><i></i></span></button>
+    <h2 class="zh-title" id="t-rangoli" data-split>Rangoli <em>Studio</em></h2>
+    <p class="zh-line" data-reveal>Symmetry is just copy-paste with excellent PR. Make something your aunt will screenshot.</p>
+  </header>
+  <div class="zone-stage" data-mount="rangoli"></div>
+</section>
+
+<div class="seam seam--rangoli" aria-hidden="true"></div>
+
+<!-- ============ IV LADDOO ============ -->
+<section class="zone zone--laddoo" id="zone-laddoo" data-zone="laddoo" data-section-id="zone-laddoo" aria-labelledby="t-laddoo">
+  <div class="zone-scenery" aria-hidden="true">
+    <div class="zs-awning"></div>
+    <div class="zs-counter"></div>
+  </div>
+  <header class="zone-head zh--laddoo zh--right">
+    <button class="hidden-diya" type="button" data-hid="hd3" style="--hx:92%;--hy:22%" aria-label="Something glints under the awning"><svg aria-hidden="true"><use href="#i-diya"/></svg><span class="e2m-flame"><i></i></span></button>
+    <h2 class="zh-title" id="t-laddoo" data-split>The Laddoo <em>Stall</em></h2>
+    <p class="zh-line" data-reveal>Calories don't count during festivals. That isn't science, but we're going with it.</p>
+  </header>
+  <div class="zone-stage" data-mount="laddoo"></div>
+</section>
+
+<div class="seam seam--diyas" aria-hidden="true"></div>
+
+<!-- ============ V LANTERNS ============ -->
+<section class="zone zone--lanterns" id="zone-lanterns" data-zone="lanterns" data-section-id="zone-lanterns" aria-labelledby="t-lanterns">
+  <div class="zone-scenery" aria-hidden="true">
+    <div class="zs-corridor zs-corridor--l" data-parallax="0.12"></div>
+    <div class="zs-corridor zs-corridor--r" data-parallax="0.12"></div>
+  </div>
+  <header class="zone-head zh--lanterns zh--right">
+    <button class="hidden-diya" type="button" data-hid="hd4" style="--hx:5%;--hy:88%" aria-label="Something glints in the corridor"><svg aria-hidden="true"><use href="#i-diya"/></svg><span class="e2m-flame"><i></i></span></button>
+    <h2 class="zh-title" id="t-lanterns" data-split>Sky <em>Lanterns</em></h2>
+    <p class="zh-line" data-reveal>Write a wish and let it float. Like that email you never sent, only prettier.</p>
+  </header>
+  <div class="zone-stage" data-mount="lanterns"></div>
+</section>
+
+<div class="seam seam--toran" aria-hidden="true"></div>
+
+<!-- ============ VI CHAKRI ============ -->
+<section class="zone zone--chakri" id="zone-chakri" data-zone="chakri" data-section-id="zone-chakri" aria-labelledby="t-chakri">
+  <div class="zone-scenery" aria-hidden="true">
+    <div class="zs-pit"></div>
+  </div>
+  <header class="zone-head zh--chakri zh--left">
+    <button class="hidden-diya" type="button" data-hid="hd5" style="--hx:95%;--hy:84%" aria-label="Something glints near the spark pit"><svg aria-hidden="true"><use href="#i-diya"/></svg><span class="e2m-flame"><i></i></span></button>
+    <h2 class="zh-title" id="t-chakri" data-split>Spin the <em>Chakri</em></h2>
+    <p class="zh-line" data-reveal>The original fidget spinner. It spins, it sparkles, it mildly terrifies uncles.</p>
+  </header>
+  <div class="zone-stage" data-mount="chakri"></div>
+</section>
+
+<div class="seam seam--rangoli" aria-hidden="true"></div>
+
+<!-- ============ VII GIFTS ============ -->
+<section class="zone zone--gifts" id="zone-gifts" data-zone="gifts" data-section-id="zone-gifts" aria-labelledby="t-gifts">
+  <div class="zone-scenery" aria-hidden="true">
+    <div class="zs-carpet"></div>
+  </div>
+  <header class="zone-head zh--gifts zh--right">
+    <button class="hidden-diya" type="button" data-hid="hd6" style="--hx:90%;--hy:16%" aria-label="Something glints behind the gifts"><svg aria-hidden="true"><use href="#i-diya"/></svg><span class="e2m-flame"><i></i></span></button>
+    <h2 class="zh-title" id="t-gifts" data-split>Pick a <em>Gift</em></h2>
+    <p class="zh-line" data-reveal>Every box hides something. Mostly joy. Occasionally a pun.</p>
+  </header>
+  <div class="zone-stage" data-mount="gifts"></div>
+</section>
+
+<div class="seam seam--toran" aria-hidden="true"></div>
+
+<!-- ============ VIII MOOD ============ -->
+<section class="zone zone--mood" id="zone-mood" data-zone="mood" data-section-id="zone-mood" aria-labelledby="t-mood">
+  <div class="zone-scenery" aria-hidden="true">
+    <svg class="zs-mandala" viewBox="-200 -200 400 400" data-mandala></svg>
+  </div>
+  <header class="zone-head zh--mood">
+    <button class="hidden-diya" type="button" data-hid="hd7" style="--hx:10%;--hy:14%" aria-label="Something glints in the mandala"><svg aria-hidden="true"><use href="#i-diya"/></svg><span class="e2m-flame"><i></i></span></button>
+    <h2 class="zh-title" id="t-mood" data-split>Diwali Mood <em>Oracle</em></h2>
+    <p class="zh-line" data-reveal>An ancient mandala and a very modern question: what kind of Diwali are you having?</p>
+  </header>
+  <div class="zone-stage" data-mount="mood"></div>
+</section>
+
+<div class="seam seam--diyas" aria-hidden="true"></div>
+
+<!-- ============ IX WISH CARD STUDIO ============ -->
+<section class="zone zone--wish" id="zone-wish" data-zone="wish" data-section-id="zone-wish" aria-labelledby="t-wish">
+  <div class="zone-scenery" aria-hidden="true">
+    <div class="zs-desk"></div>
+  </div>
+  <header class="zone-head zh--wish zh--left">
+    <h2 class="zh-title" id="t-wish" data-split>Wish Card <em>Studio</em></h2>
+    <p class="zh-line" data-reveal>Write someone a Diwali card worth keeping. Gold ink, zero calligraphy skills required.</p>
+    <p class="zh-hint" data-hint><span class="zh-hint-mark" aria-hidden="true"></span><span class="sr-only">How to use: </span>Type a name · choose a wish and a style · download or share it</p>
+  </header>
+  <div class="zone-stage" data-mount="wish"></div>
+</section>
+
+<div class="seam seam--rangoli" aria-hidden="true"></div>
+
+<!-- ============ X FINALE ============ -->
+<section class="zone zone--finale" id="zone-finale" data-zone="finale" data-section-id="zone-finale" aria-labelledby="t-finale">
+  <div class="zone-scenery" aria-hidden="true"></div>
+  <header class="zone-head zh--finale">
+    <h2 class="zh-title" id="t-finale" data-split>Everything You Lit Tonight, <em>All at Once</em></h2>
+    <p class="zh-line" data-reveal>One button. Every lamp in the temple town. You've earned this.</p>
+  </header>
+  <div class="zone-stage" data-mount="finale">
+    <div class="finale">
+      <div class="fn-floor" aria-hidden="true"></div>
+      <div class="fn-palace" aria-hidden="true"></div>
+      <div class="fn-core">
+        <button class="btn-diya btn-diya--lg fn-go" type="button"><span>Make this Diwali unforgettable!</span></button>
+        <div class="fn-reveal" aria-live="polite">
+          <p class="fn-brand"><img class="fn-logo" src="assets/e2m-logo-white.svg" alt="E2M" width="64" height="64" decoding="async"></p>
+          <p class="fn-kicker label-caps">Diwali 2026</p>
+          <p class="fn-stamps" lang="hi"><span class="deva-stamp">श्री</span><span class="deva-stamp">शुभ लाभ</span></p>
+          <h3 class="fn-hello"><span class="fn-hello-line">Happy Diwali,</span> <span class="fn-hello-line fn-hello-line--2">E2M Family!</span></h3>
+          <p class="fn-thanks">Celebrating creativity, collaboration, happiness and the light we bring together.</p>
+          <button class="btn-plain fn-replay" type="button"><span>Light it all up again</span></button>
+          <p class="fn-score" data-finale-score></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /.world -->
+</main>
+
+<footer class="site-foot">
+  <p class="foot-mark" aria-hidden="true"><img src="assets/e2m-logo-white.svg" alt="" width="64" height="64" decoding="async" loading="lazy"></p>
+  <p class="foot-line">Happy Diwali from the whole E2M family.</p>
+  <p class="foot-small">Built with zero deadlines and roughly a thousand lights. <a href="#opening">Back to the temple gate</a></p>
+</footer>
+
+<div class="gold-flash" aria-hidden="true"></div>
+<div class="e2m-toasts" id="e2m-toasts" role="status" aria-live="polite"></div>
+<!-- Revision 2: screen-reader announcements (E2M.announce) — scores, timers, results, outcomes -->
+<div class="sr-only" id="e2m-live" role="status" aria-live="polite" aria-atomic="true"></div>
+<div class="sr-only" id="e2m-live-assertive" role="alert" aria-live="assertive" aria-atomic="true"></div>
+</body>
+</html>

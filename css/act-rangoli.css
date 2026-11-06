@@ -1,0 +1,610 @@
+/* E2M Diwali - Activity 03: Rangoli Studio (scoped to .act-rangoli)
+   Revision 1: one quiet instrument. A single gold hairline frame holds the
+   floor and a slim tool column; colour lives only in the powder itself. */
+
+.act-rangoli {
+  --ar-navy: var(--navy, #080B1E);
+  --ar-gold: var(--gold, #FFD778);
+  --ar-ivory: var(--ivory, #FFF4DC);
+  --ar-hair: var(--gold-hair, rgba(255, 215, 120, .34));
+  --ar-hair-soft: var(--gold-hair-soft, rgba(255, 215, 120, .18));
+  --ar-display: var(--font-display, "Cormorant Garamond", Georgia, serif);
+  --ar-ui: var(--font-body, "Mukta", system-ui, sans-serif);
+  --ar-track: var(--track-label, .28em);
+  --ar-ease: var(--ease-lux, cubic-bezier(.25, .1, .1, 1));
+  position: relative;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 max(var(--gutter, 20px), env(safe-area-inset-right, 0px)) 0 max(var(--gutter, 20px), env(safe-area-inset-left, 0px));
+  color: var(--ar-ivory);
+  font-family: var(--ar-ui);
+  font-weight: 400;
+  box-sizing: border-box;
+}
+.act-rangoli *,
+.act-rangoli *::before,
+.act-rangoli *::after { box-sizing: border-box; }
+.act-rangoli button { font: inherit; color: inherit; }
+.act-rangoli p { color: inherit; }
+
+.act-rangoli .ar-layout {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+/* The frame's dark fill is its own layer (Revision 5 b: no full-screen bloom any more, so it never thins).
+   Revision 4: deep space — the fill is a feathered pool of space-1 night (no rectangle), densest under the
+   floor and the tools, dissolving into the continuous backdrop at every edge. */
+.act-rangoli .ar-layout::before {
+  content: "";
+  position: absolute;
+  inset: -40px 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 52% 56% at 40% 50%, rgba(8, 11, 30, .74), rgba(8, 11, 30, .5) 60%, rgba(8, 11, 30, 0) 100%),
+    radial-gradient(ellipse 30% 52% at 84% 50%, rgba(8, 11, 30, .72), rgba(8, 11, 30, .42) 62%, rgba(8, 11, 30, 0) 100%);
+}
+/* the gold hairline frame keeps only its top and bottom rules, feathered to nothing at both ends */
+.act-rangoli .ar-layout::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-top: var(--hair-w, 1px) solid var(--ar-hair);
+  border-bottom: var(--hair-w, 1px) solid var(--ar-hair);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 16%, #000 84%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 16%, #000 84%, transparent);
+}
+@media (max-width: 979px) {
+  .act-rangoli .ar-layout::before {
+    background: radial-gradient(ellipse 62% 54% at 50% 46%, rgba(8, 11, 30, .74), rgba(8, 11, 30, .5) 62%, rgba(8, 11, 30, 0) 100%);
+  }
+}
+@media (min-width: 980px) {
+  .act-rangoli .ar-layout { grid-template-columns: minmax(0, 1fr) 300px; }
+}
+
+/* ---------- the drafting floor ---------- */
+.act-rangoli .ar-floor {
+  position: relative;
+  padding: clamp(20px, 4vw, 56px) clamp(14px, 4vw, 56px) clamp(16px, 2.4vw, 28px);
+  background: radial-gradient(ellipse 60% 55% at 50% 44%, rgba(18, 16, 58, .5), rgba(8, 11, 30, 0) 72%);
+}
+.act-rangoli .ar-board { position: relative; }
+.act-rangoli .ar-canvas-wrap {
+  position: relative;
+  width: min(100%, 68vh, 640px);
+  min-width: 240px;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+}
+@supports not (aspect-ratio: 1 / 1) {
+  .act-rangoli .ar-canvas-wrap { height: 0; padding-bottom: min(100%, 640px); }
+}
+.act-rangoli .ar-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  touch-action: none;
+  cursor: crosshair;
+  -webkit-tap-highlight-color: transparent;
+}
+.act-rangoli .ar-canvas:focus { outline: none; }
+.act-rangoli .ar-canvas:focus-visible { outline: var(--focus-ring, 2px solid #FFD778); outline-offset: 6px; }
+
+/* coach: a still, quiet caption (no pinging dot) */
+.act-rangoli .ar-coach {
+  position: absolute;
+  left: 50%;
+  bottom: 22%;
+  transform: translateX(-50%);
+  margin: 0;
+  pointer-events: none;
+  font: 400 .75rem/1 var(--ar-ui);
+  letter-spacing: var(--ar-track);
+  text-transform: uppercase;
+  color: var(--ivory-80, rgba(255, 244, 220, .8));
+  white-space: nowrap;
+  transition: opacity .9s var(--ar-ease);
+}
+.act-rangoli .ar-coach span { display: inline-block; padding: 0 0 0 .28em; }
+.act-rangoli .ar-coach.is-gone { opacity: 0; }
+
+/* ---------- Revision 3: idle life on the slab (compositor-only CSS; gated below) ---------- */
+.act-rangoli .ar-breath {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  will-change: opacity;
+  background: radial-gradient(circle at 44% 38%, rgba(255, 206, 140, .1), rgba(255, 190, 110, .04) 42%, transparent 66%);
+  opacity: .5;
+  animation: ar-breathe 8.5s ease-in-out infinite alternate;
+}
+@keyframes ar-breathe { from { opacity: .22; } to { opacity: 1; } }
+.act-rangoli .ar-glints { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; pointer-events: none; }
+.act-rangoli .ar-glints i {
+  position: absolute;
+  width: 11px; height: 11px;
+  margin: -5.5px 0 0 -5.5px;
+  opacity: 0;
+  will-change: opacity, transform;
+  background:
+    radial-gradient(circle, rgba(255, 250, 235, .95) 0 1px, rgba(255, 228, 170, .35) 1.8px, transparent 3.6px),
+    linear-gradient(90deg, transparent 44%, rgba(255, 244, 220, .55) 50%, transparent 56%),
+    linear-gradient(0deg, transparent 44%, rgba(255, 244, 220, .55) 50%, transparent 56%);
+  animation: ar-glint 4.4s var(--ar-ease) infinite;
+}
+.act-rangoli .ar-glints i:nth-child(2) { animation-duration: 5.2s; animation-delay: -1.1s; }
+.act-rangoli .ar-glints i:nth-child(3) { animation-duration: 4.8s; animation-delay: -2.3s; }
+.act-rangoli .ar-glints i:nth-child(4) { animation-duration: 6.1s; animation-delay: -3.4s; }
+.act-rangoli .ar-glints i:nth-child(5) { animation-duration: 5.6s; animation-delay: -0.5s; }
+.act-rangoli .ar-glints i:nth-child(6) { animation-duration: 4.2s; animation-delay: -2.9s; }
+.act-rangoli .ar-glints i:nth-child(7) { animation-duration: 6.6s; animation-delay: -4.6s; }
+/* R4: the glints on the slab twinkle by opacity and a slow turn only (no scale on the floor layer) */
+@keyframes ar-glint {
+  0%, 64%, 100% { opacity: 0; transform: rotate(0deg); }
+  74% { opacity: .9; transform: rotate(28deg); }
+  86% { opacity: 0; transform: rotate(45deg); }
+}
+.act-rangoli.is-empty .ar-glints i { animation-name: ar-glint-faint; }
+@keyframes ar-glint-faint {
+  0%, 64%, 100% { opacity: 0; transform: none; }
+  76% { opacity: .38; transform: rotate(20deg); }
+  88% { opacity: 0; transform: none; }
+}
+html.is-calm .act-rangoli .ar-glints { display: none; }
+html.is-calm .act-rangoli .ar-breath { animation: none; opacity: .6; }
+html.is-paused .act-rangoli .ar-glints i,
+html.is-paused .act-rangoli .ar-breath,
+.act-rangoli.is-off .ar-glints i,
+.act-rangoli.is-off .ar-breath { animation-play-state: paused; }
+
+/* ---------- Revision 3: the magic style caption — a museum label under the floor ---------- */
+.act-rangoli .ar-style {
+  margin: clamp(12px, 1.8vw, 20px) 0 0;
+  min-height: 3.3em;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 1s var(--ar-ease), transform 1.2s var(--ar-ease);
+}
+.act-rangoli .ar-style.is-on { opacity: 1; transform: none; }
+.act-rangoli .ar-style-k {
+  display: block;
+  font: 400 .75rem/1.4 var(--ar-ui);
+  letter-spacing: var(--ar-track);
+  text-transform: uppercase;
+  color: var(--gold-text, rgba(255, 215, 120, .86));
+}
+.act-rangoli .ar-style-n {
+  display: block;
+  margin-top: .3em;
+  font-family: var(--ar-display);
+  font-weight: 300;
+  font-size: clamp(1.4rem, 2.3vw, 1.85rem);
+  line-height: 1.1;
+  letter-spacing: .005em;
+  color: var(--ar-ivory);
+}
+
+.act-rangoli .ar-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px 20px;
+  margin-top: clamp(16px, 2.4vw, 28px);
+  padding-top: 14px;
+  border-top: var(--hair-w, 1px) solid var(--ar-hair-soft);
+}
+.act-rangoli .ar-count {
+  margin: 0;
+  font: 400 .75rem/1.4 var(--ar-ui);
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--ivory-78, rgba(255, 244, 220, .76));
+}
+.act-rangoli .ar-count b {
+  margin-right: .25em;
+  font-family: var(--ar-display);
+  font-weight: 400;
+  font-size: 23px;
+  letter-spacing: 0;
+  color: var(--ar-gold);
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: "lnum" 1, "tnum" 1;
+}
+.act-rangoli .ar-dot {
+  display: inline-block;
+  width: 3px; height: 3px;
+  margin: 0 .9em 3px .4em;
+  background: var(--ar-hair);
+  transform: rotate(45deg);
+}
+.act-rangoli .ar-quip {
+  margin: 0;
+  font-family: var(--ar-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1rem, 1.4vw, 1.2rem);
+  color: var(--ivory-80, rgba(255, 244, 220, .8));
+}
+
+/* ---------- the tool column ---------- */
+.act-rangoli .ar-tray {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(22px, 3vw, 36px) clamp(18px, 2.4vw, 28px);
+  border-top: var(--hair-w, 1px) solid var(--ar-hair-soft);
+  border-image: linear-gradient(90deg, transparent, var(--ar-hair-soft) 18%, var(--ar-hair-soft) 82%, transparent) 1;
+}
+@media (min-width: 980px) {
+  .act-rangoli .ar-tray { border-top: 0; border-left: var(--hair-w, 1px) solid var(--ar-hair-soft); border-image: linear-gradient(180deg, transparent, var(--ar-hair-soft) 18%, var(--ar-hair-soft) 82%, transparent) 1; }
+}
+
+.act-rangoli .ar-group { margin-bottom: 26px; }
+.act-rangoli .ar-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0 0 12px;
+  font: 400 .75rem/1.3 var(--ar-ui);
+  letter-spacing: var(--ar-track);
+  text-transform: uppercase;
+  color: var(--gold-text, rgba(255, 215, 120, .86));
+}
+.act-rangoli .ar-label span {
+  font-family: var(--ar-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 1rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ivory-80, rgba(255, 244, 220, .82));
+}
+
+/* pattern row: borderless glyphs, the chosen one sits on a hairline */
+.act-rangoli .ar-patterns {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 2px;
+}
+.act-rangoli .ar-pat {
+  position: relative;
+  min-height: 44px;
+  aspect-ratio: 1 / 1;
+  padding: 7px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: border-color var(--dur-quick, .45s) var(--ar-ease);
+}
+.act-rangoli .ar-pat canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: .42;
+  filter: saturate(.25);
+  transition: opacity var(--dur-quick, .45s) var(--ar-ease), filter var(--dur-quick, .45s) var(--ar-ease);
+}
+.act-rangoli .ar-pat:hover canvas { opacity: .8; filter: saturate(.7); }
+.act-rangoli .ar-pat[aria-checked="true"] { border-color: var(--ar-gold); }
+.act-rangoli .ar-pat[aria-checked="true"] canvas { opacity: 1; filter: none; }
+.act-rangoli .ar-pat-name {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* powder: small matte dots, a gold ring marks the chosen one */
+.act-rangoli .ar-swatches {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 2px;
+}
+.act-rangoli .ar-swatch {
+  position: relative;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.act-rangoli .ar-mound {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, var(--sw-l), var(--sw) 60%, var(--sw-d));
+  opacity: .86;
+  transition: opacity var(--dur-quick, .45s) var(--ar-ease), transform var(--dur-quick, .45s) var(--ar-ease);
+}
+.act-rangoli .ar-swatch::after {
+  content: "";
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 28px; height: 28px;
+  transform: translate(-50%, -50%) scale(.8);
+  border-radius: 50%;
+  border: 1px solid var(--ar-gold);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-quick, .45s) var(--ar-ease), transform var(--dur-quick, .45s) var(--ar-ease);
+}
+.act-rangoli .ar-swatch:hover .ar-mound { opacity: 1; }
+.act-rangoli .ar-swatch[aria-checked="true"] .ar-mound { opacity: 1; transform: scale(1.12); }
+.act-rangoli .ar-swatch[aria-checked="true"]::after { opacity: .9; transform: translate(-50%, -50%) scale(1); }
+
+/* symmetry: one hairline segmented control */
+.act-rangoli .ar-sym {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: var(--hair-w, 1px) solid var(--ar-hair);
+}
+.act-rangoli .ar-symbtn {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-left: var(--hair-w, 1px) solid var(--ar-hair-soft);
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--ar-display);
+  font-weight: 300;
+  font-size: 19px;
+  font-variant-numeric: lining-nums;
+  font-feature-settings: "lnum" 1;
+  color: var(--ivory-80, rgba(255, 244, 220, .8));
+  transition: color var(--dur-quick, .45s) var(--ar-ease), background-color var(--dur-quick, .45s) var(--ar-ease);
+}
+.act-rangoli .ar-symbtn:first-child { border-left: 0; }
+.act-rangoli .ar-symbtn:hover { color: var(--ar-ivory); }
+.act-rangoli .ar-symbtn[aria-checked="true"] { color: var(--ar-gold); background: var(--gold-faint, rgba(255, 215, 120, .1)); box-shadow: inset 0 -2px 0 var(--ar-gold); }
+
+/* size: a hairline track with a small gold bead */
+.act-rangoli .ar-size { display: flex; align-items: center; gap: 14px; }
+.act-rangoli .ar-size-dot { flex: none; border-radius: 50%; border: 1px solid rgba(255, 244, 220, .45); }
+.act-rangoli .ar-size-dot--s { width: 5px; height: 5px; }
+.act-rangoli .ar-size-dot--l { width: 13px; height: 13px; }
+.act-rangoli input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  height: 44px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.act-rangoli input[type="range"]::-webkit-slider-runnable-track {
+  height: 1px;
+  background: linear-gradient(90deg, var(--ar-gold) 0 var(--fill, 30%), rgba(255, 244, 220, .2) var(--fill, 30%) 100%);
+}
+.act-rangoli input[type="range"]::-moz-range-track { height: 1px; background: rgba(255, 244, 220, .2); }
+.act-rangoli input[type="range"]::-moz-range-progress { height: 1px; background: var(--ar-gold); }
+.act-rangoli input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 13px; height: 13px;
+  margin-top: -6px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--ar-gold);
+  box-shadow: 0 0 0 4px var(--ar-navy);
+}
+.act-rangoli input[type="range"]::-moz-range-thumb {
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--ar-gold);
+  box-shadow: 0 0 0 4px var(--ar-navy);
+}
+.act-rangoli input[type="range"]:focus { outline: none; }
+.act-rangoli input[type="range"]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px var(--ar-navy), 0 0 0 5px var(--ar-gold); }
+.act-rangoli input[type="range"]:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4px var(--ar-navy), 0 0 0 5px var(--ar-gold); }
+
+/* the one gold action */
+.act-rangoli .ar-magic { width: 100%; margin-top: 4px; }
+
+/* quiet secondary actions: icon + tracked caps, no boxes */
+.act-rangoli .ar-tools,
+.act-rangoli .ar-more {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 14px;
+}
+.act-rangoli .ar-more {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: var(--hair-w, 1px) solid var(--ar-hair-soft);
+}
+.act-rangoli .ar-more[hidden] { display: none; }
+.act-rangoli .ar-tool {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 56px;
+  padding: 6px 2px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: 400 .75rem/1.2 var(--ar-ui);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ivory-80, rgba(255, 244, 220, .8));
+  transition: color var(--dur-quick, .45s) var(--ar-ease);
+}
+.act-rangoli .ar-tool > span { margin-right: -.14em; }
+.act-rangoli .ar-ico { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; }
+.act-rangoli .ar-tool:hover,
+.act-rangoli .ar-tool[aria-expanded="true"] { color: var(--ar-gold); }
+.act-rangoli .ar-tool[aria-pressed="true"] { color: var(--ar-gold); }
+/* a toggle that is off keeps readable text (>= 4.5:1); only its icon dims */
+.act-rangoli .ar-tool[aria-pressed="false"] { color: var(--ivory-78, rgba(255, 244, 220, .74)); }
+.act-rangoli .ar-tool[aria-pressed="false"] .ar-ico { opacity: .45; }
+
+.act-rangoli .ar-pat:focus-visible,
+.act-rangoli .ar-swatch:focus-visible,
+.act-rangoli .ar-symbtn:focus-visible,
+.act-rangoli .ar-tool:focus-visible {
+  outline: var(--focus-ring, 2px solid #FFD778);
+  outline-offset: -2px;
+}
+.act-rangoli input[type="range"]:focus-visible { outline: var(--focus-ring, 2px solid #FFD778); outline-offset: 2px; }
+
+.act-rangoli .ar-sr {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 979px) {
+  .act-rangoli .ar-canvas-wrap { width: min(100%, 62vh, 600px); }
+  .act-rangoli .ar-tray { max-width: 520px; width: 100%; margin: 0 auto; }
+}
+@media (max-width: 420px) {
+  .act-rangoli { padding: 0 max(12px, env(safe-area-inset-right, 0px)) 0 max(12px, env(safe-area-inset-left, 0px)); }
+  .act-rangoli .ar-floor { padding: 18px 10px 14px; }
+  .act-rangoli .ar-coach { font-size: .75rem; letter-spacing: .14em; }
+  .act-rangoli .ar-tool { letter-spacing: .08em; }
+  .act-rangoli .ar-style-k { letter-spacing: .16em; }
+}
+
+/* ---------- Revision 2: quiet how-to hint ---------- */
+.act-rangoli .act-hint {
+  margin: 0 auto 18px;
+  max-width: 62ch;
+  text-align: center;
+  font: 400 .8125rem/1.6 var(--ar-ui);
+  letter-spacing: .06em;
+  color: var(--ivory-80, rgba(255, 244, 220, .8));
+  transition: opacity .9s var(--ar-ease), visibility 0s linear .9s;
+}
+.act-rangoli .act-hint.is-gone { opacity: 0; visibility: hidden; }
+
+/* ---------- finale floor rangoli (lives outside .act-rangoli) ----------
+   Revision 5 (b): INLINE ONLY — absolutely positioned and clipped inside its target (the finale floor).
+   There is no fixed, full-viewport, blended or masked overlay variant any more. */
+.act-rangoli-bloom {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: opacity 1.2s var(--ease-lux, ease);
+}
+.act-rangoli-bloom canvas { display: block; max-width: 100%; max-height: 100%; }
+.act-rangoli-bloom.is-on { opacity: .85; }
+.act-rangoli-bloom.is-out { opacity: 0; transition-duration: 1.4s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .act-rangoli .ar-glints { display: none; }
+  .act-rangoli .ar-breath { animation: none; opacity: .6; }
+  .act-rangoli .ar-style { transition: none; transform: none; }
+  .act-rangoli .ar-mound,
+  .act-rangoli .ar-swatch::after { transition: none; }
+  .act-rangoli-bloom { transition-duration: .01s; }
+}
+
+
+/* ==========================================================================
+   REVISION 6 — less "AI slop", more real Diwali
+   The tray becomes a puja thali: Mukta labels in sentence case, powder shown as kumkum-heap dishes,
+   symmetry as a marigold-dot switch, the tools as tilak dots, a diya for the one big action.
+   ========================================================================== */
+.act-rangoli {
+  --ar-warli: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 42' fill='none' stroke='%23FFD778' stroke-width='1.4' stroke-linejoin='round' stroke-linecap='round'%3E%3Ccircle cx='20' cy='7' r='3.2'/%3E%3Ccircle cx='60' cy='7' r='3.2'/%3E%3Ccircle cx='100' cy='7' r='3.2'/%3E%3Cpath d='M14 12h12l-6 10zM14 32h12l-6-10zM54 12h12l-6 10zM54 32h12l-6-10zM94 12h12l-6 10zM94 32h12l-6-10zM17 32l-2 8M23 32l2 8M57 32l-2 8M63 32l2 8M97 32l-2 8M103 32l2 8M26 13q17 9 34 0M66 13q17 9 34 0M14 13L6 19M106 13l8 6'/%3E%3C/svg%3E");
+  --ar-rice: radial-gradient(circle, rgba(255, 248, 236, .75) 0 1.4px, transparent 1.9px);
+}
+.act-rangoli .act-hint { font: 400 var(--fs-hint)/1.6 var(--ar-ui); letter-spacing: 0; max-width: 54ch; color: var(--ink); }
+.act-rangoli .ar-coach { font: 600 var(--fs-ui)/1.2 var(--ar-ui); letter-spacing: .01em; text-transform: none; color: var(--ink); text-shadow: 0 1px 8px rgba(5, 7, 15, .9); }
+.act-rangoli .ar-coach span { padding: 0; }
+.act-rangoli .ar-tray { position: relative; }
+.act-rangoli .ar-tray::after {
+  content: ""; position: absolute; left: 50%; bottom: 6px; width: 170px; height: 60px; transform: translateX(-50%);
+  background: var(--ar-warli) center / contain no-repeat; opacity: .09; pointer-events: none;
+}
+
+.act-rangoli .ar-tray-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 0 22px; padding-bottom: 14px; background: var(--ar-rice) 0 100% / 12px 6px repeat-x; }
+.act-rangoli .ar-tray-hi { font: 400 clamp(1.5rem, 1.2rem + 1vw, 1.9rem)/1 var(--font-accent); color: var(--marigold-text); }
+.act-rangoli .ar-tray-en { font: 500 var(--fs-ui)/1.2 var(--ar-ui); color: var(--ink); }
+
+.act-rangoli .ar-label { font: 600 var(--fs-ui)/1.3 var(--ar-ui); letter-spacing: .01em; text-transform: none; color: var(--marigold-text); margin-bottom: 10px; }
+.act-rangoli .ar-label span { font: 400 var(--fs-ui)/1.3 var(--font-accent); font-style: normal; color: var(--ink); }
+
+/* patterns: the chosen one sits in a dotted marigold ring on a tinted tile */
+.act-rangoli .ar-pat { border: 1.5px dotted transparent; border-radius: 14px; }
+.act-rangoli .ar-pat canvas { opacity: .66; filter: saturate(.55); }
+.act-rangoli .ar-pat:hover { background: rgba(255, 181, 46, .08); }
+.act-rangoli .ar-pat[aria-checked="true"] { border-color: var(--marigold); background: rgba(255, 181, 46, .13); box-shadow: 0 0 14px rgba(255, 170, 50, .25); }
+.act-rangoli .ar-pat[aria-checked="true"]::after { content: ""; position: absolute; left: 50%; bottom: -5px; width: 7px; height: 7px; margin-left: -3.5px; border-radius: 50%; background: var(--kumkum); box-shadow: 0 0 0 1.5px var(--brass); }
+
+/* powder: heaped in little dishes (kumkum-style mounds with a rice-grain highlight) */
+.act-rangoli .ar-mound { width: 24px; height: 24px; opacity: 1; box-shadow: 0 0 0 2.5px rgba(8, 11, 30, .8), 0 0 0 3.5px rgba(217, 164, 65, .55), 0 3px 6px rgba(0, 0, 0, .5); position: relative; }
+.act-rangoli .ar-mound::after { content: ""; position: absolute; left: 30%; top: 22%; width: 5px; height: 3px; border-radius: 50%; background: rgba(255, 248, 236, .8); transform: rotate(-30deg); }
+.act-rangoli .ar-swatch::after { width: 40px; height: 40px; border: 2px dotted var(--marigold); }
+.act-rangoli .ar-swatch[aria-checked="true"] .ar-mound { transform: scale(1.08); }
+
+/* symmetry: the shared marigold-dot switch */
+.act-rangoli .ar-sym.seg { display: flex; flex-wrap: nowrap; border: 0; gap: 2px; width: 100%; }
+.act-rangoli .ar-sym.seg > button { flex: 1 1 0; justify-content: center; gap: .4em; padding: .3em .2em .35em; border: 0; min-height: 44px; font: 400 1.2rem/1 var(--font-accent); box-shadow: none; color: var(--ink); }
+.act-rangoli .ar-sym.seg > button[aria-checked="true"] { box-shadow: none; color: var(--ivory); background: rgba(255, 181, 46, .16); }
+.act-rangoli .ar-sym.seg > button:focus-visible { outline: var(--focus-ring); outline-offset: 1px; }
+
+/* size: a brass thread with a marigold bead */
+.act-rangoli input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--marigold) 0 var(--fill, 30%), rgba(255, 244, 220, .25) var(--fill, 30%) 100%); }
+.act-rangoli input[type="range"]::-moz-range-track { height: 4px; border-radius: 2px; background: rgba(255, 244, 220, .25); }
+.act-rangoli input[type="range"]::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--marigold); }
+.act-rangoli input[type="range"]::-webkit-slider-thumb { width: 22px; height: 22px; margin-top: -9px; background: radial-gradient(circle, #A84806 0 22%, var(--haldi) 30% 52%, var(--marigold-deep) 60%); box-shadow: 0 0 0 2px var(--navy), 0 0 0 3.5px var(--brass); }
+.act-rangoli input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; background: radial-gradient(circle, #A84806 0 22%, var(--haldi) 30% 52%, var(--marigold-deep) 60%); box-shadow: 0 0 0 2px var(--navy), 0 0 0 3.5px var(--brass); }
+.act-rangoli input[type="range"]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 2px var(--navy), 0 0 0 4px var(--gold); }
+.act-rangoli input[type="range"]:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px var(--navy), 0 0 0 4px var(--gold); }
+.act-rangoli .ar-size-dot { border-color: rgba(255, 244, 220, .7); }
+
+/* the one big action: a diya (leave headroom for its flame) */
+.act-rangoli .ar-magic { margin: 30px 0 6px; width: calc(100% - 22px); }
+
+/* tools: kumkum tilak dots with a caption (same visual language as .btn-tilak, caption underneath) */
+.act-rangoli .ar-tools, .act-rangoli .ar-more { margin-top: 16px; gap: 4px; }
+.act-rangoli .ar-tool { gap: 6px; min-height: 76px; padding: 4px 2px; font: 600 var(--fs-micro)/1.2 var(--ar-ui); letter-spacing: .01em; text-transform: none; color: var(--ink); border-radius: 12px; }
+.act-rangoli .ar-tool > span { margin: 0; }
+.act-rangoli .ar-ico { width: 44px; height: 44px; padding: 11px; stroke-width: 1.6; stroke: var(--rice); border-radius: 50%;
+  background: radial-gradient(circle at 36% 30%, #E8344A 0, var(--kumkum) 46%, var(--kumkum-deep) 100%);
+  box-shadow: inset 0 0 0 2px var(--brass), inset 0 0 0 3.5px rgba(78, 28, 8, .6), 0 2px 5px rgba(0, 0, 0, .5);
+  transition: box-shadow .3s var(--ar-ease), filter .3s var(--ar-ease), transform .3s var(--ar-ease); }
+.act-rangoli .ar-ico circle[r="1"] { fill: var(--rice); }
+.act-rangoli .ar-tool:hover .ar-ico, .act-rangoli .ar-tool[aria-expanded="true"] .ar-ico { filter: brightness(1.12); box-shadow: inset 0 0 0 2px var(--brass-hi), inset 0 0 0 3.5px rgba(78, 28, 8, .6), 0 0 14px 2px rgba(240, 50, 74, .45); transform: translateY(-1px); }
+.act-rangoli .ar-tool:hover, .act-rangoli .ar-tool[aria-expanded="true"], .act-rangoli .ar-tool[aria-pressed="true"] { color: var(--marigold-text); }
+.act-rangoli .ar-tool[aria-pressed="true"] .ar-ico { box-shadow: inset 0 0 0 2px var(--gold), 0 0 14px 3px rgba(255, 190, 80, .5); }
+.act-rangoli .ar-tool[aria-pressed="false"] { color: var(--ink); }
+.act-rangoli .ar-tool[aria-pressed="false"] .ar-ico { opacity: .55; filter: grayscale(.5); }
+.act-rangoli .ar-tool:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
+
+/* the style caption, count and quip under the floor */
+.act-rangoli .ar-style-k { font: 400 var(--fs-eyebrow)/1.3 var(--font-accent); letter-spacing: .01em; text-transform: none; color: var(--marigold-text); }
+.act-rangoli .ar-style-n { font-weight: 400; font-size: clamp(1.7rem, 1.2rem + 1.6vw, 2.3rem); }
+.act-rangoli .ar-count { font: 500 var(--fs-ui)/1.4 var(--ar-ui); letter-spacing: 0; text-transform: none; color: var(--ink); }
+.act-rangoli .ar-count b { font: 400 var(--fs-num)/1 var(--font-accent); color: var(--marigold-text); margin-right: .2em; }
+.act-rangoli .ar-dot { width: 7px; height: 7px; transform: none; border-radius: 50%; background: var(--kumkum); box-shadow: 0 0 0 1.5px var(--brass); margin: 0 .8em 2px .4em; }
+.act-rangoli .ar-quip { font-family: var(--ar-ui); font-style: normal; font-weight: 400; font-size: var(--fs-hint); color: var(--ink); }
+@media (max-width: 420px) { .act-rangoli .ar-tool { letter-spacing: 0; } .act-rangoli .ar-style-k { letter-spacing: 0; } .act-rangoli .ar-coach { letter-spacing: 0; } }

@@ -1,0 +1,497 @@
+/* E2M Diwali - Activity 04: Laddoo Catcher (scoped to .act-laddoo)
+   Revision 1: the stall becomes a single gold hairline frame; colour is reserved for the sweets.
+   Revision 3: haveli mandapa backdrop + toran drawn on the canvas; full-screen golden shower via
+   E2M.screenLayer (mirrored into the opaque arena so it reads as one layer). */
+
+.act-laddoo {
+  --al-navy: var(--navy, #080B1E);
+  --al-gold: var(--gold, #FFD778);
+  --al-saffron: var(--saffron, #FF9F32);
+  --al-ivory: var(--ivory, #FFF4DC);
+  --al-hair: var(--gold-hair, rgba(255, 215, 120, .34));
+  --al-hair-soft: var(--gold-hair-soft, rgba(255, 215, 120, .18));
+  --al-display: var(--font-display, "Cormorant Garamond", Georgia, serif);
+  --al-ui: var(--font-body, "Mukta", system-ui, sans-serif);
+  --al-track: var(--track-label, .28em);
+  --al-ease: var(--ease-lux, cubic-bezier(.25, .1, .1, 1));
+  position: relative;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 max(var(--gutter, 20px), env(safe-area-inset-right, 0px)) 0 max(var(--gutter, 20px), env(safe-area-inset-left, 0px));
+  color: var(--al-ivory);
+  font-family: var(--al-ui);
+  font-weight: 300;
+  box-sizing: border-box;
+}
+.act-laddoo *, .act-laddoo *::before, .act-laddoo *::after { box-sizing: border-box; }
+.act-laddoo button { font: inherit; color: inherit; }
+.act-laddoo p { color: inherit; }
+
+/* ---------- the stall frame ---------- */
+/* Revision 4: deep space. The stall has no fill of its own: the continuous space backdrop shows through, a
+   soft feathered scrim keeps the sweets legible, and the gold hairline frame dissolves towards the floor and
+   the corners instead of boxing the stage in (no hard rectangle at any width). */
+.act-laddoo {
+  --al-sp0: var(--space-0, #05070F);
+  --al-sp1: var(--space-1, #080B1E);
+  --al-sp2: var(--space-2, #12103A);
+}
+.act-laddoo .al-stall {
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.act-laddoo .al-stall::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  border: var(--hair-w, 1px) solid var(--al-hair);
+  border-bottom: 0;
+  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 46%, transparent 96%), linear-gradient(90deg, transparent 0, #000 9%, #000 91%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(180deg, #000 0, #000 46%, transparent 96%), linear-gradient(90deg, transparent 0, #000 9%, #000 91%, transparent 100%);
+  mask-composite: intersect;
+}
+/* the top hairline stays whole across the bandhanwar; only the sides and corners feather */
+.act-laddoo .al-stall::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 1px;
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--al-hair) 12%, var(--al-hair) 88%, transparent);
+}
+/* Revision 3: the scalloped valance is gone — a bandhanwar (mango leaves + marigolds) is drawn live on the
+   canvas, swaying in the breeze, above a haveli mandapa (pillars, beam, deepmala niches). */
+
+.act-laddoo .al-arena {
+  position: relative;
+  height: clamp(560px, 76vh, 700px);
+  overflow: hidden;
+  background: transparent;
+}
+/* a feathered night scrim behind the canvas: darkest under the falling sweets, nothing at the edges */
+.act-laddoo .al-arena::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 58% 62% at 50% 52%, rgba(8, 11, 30, .52), rgba(8, 11, 30, .26) 58%, rgba(5, 7, 15, 0) 100%),
+    radial-gradient(ellipse 46% 30% at 50% 100%, rgba(18, 16, 58, .42), rgba(18, 16, 58, 0) 100%);
+}
+.act-laddoo .al-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: pan-y;
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+}
+.act-laddoo.is-playing .al-canvas { touch-action: none; cursor: none; }
+.act-laddoo .al-canvas:focus { outline: none; }
+.act-laddoo .al-canvas:focus-visible { outline: var(--focus-ring, 2px solid #FFD778); outline-offset: -8px; }
+.act-laddoo button:focus-visible { outline: var(--focus-ring, 2px solid #FFD778); outline-offset: 3px; }
+
+/* ---------- HUD: quiet tracked caps ---------- */
+.act-laddoo .al-hud {
+  position: absolute;
+  top: 40px; left: 0; right: 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 0 clamp(18px, 3vw, 36px);
+  pointer-events: none;
+}
+.act-laddoo .al-score,
+.act-laddoo .al-timer { display: flex; flex-direction: column; gap: 4px; line-height: 1; }
+.act-laddoo .al-timer { align-items: flex-end; position: relative; }
+.act-laddoo .al-score span,
+.act-laddoo .al-timer span {
+  font: 400 .75rem/1 var(--al-ui);
+  letter-spacing: var(--al-track);
+  text-transform: uppercase;
+  color: var(--gold-text, rgba(255, 215, 120, .86));
+}
+.act-laddoo .al-score b,
+.act-laddoo .al-timer b {
+  font-family: var(--al-display);
+  font-weight: 300;
+  font-size: clamp(30px, 3.2vw, 40px);
+  color: var(--al-ivory);
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: "lnum" 1, "tnum" 1;
+  transition: color var(--dur-quick, .45s) var(--al-ease);
+}
+.act-laddoo .al-timer svg { display: none; }
+.act-laddoo .al-timer.is-hurry b { color: var(--al-saffron); }
+.act-laddoo .al-combo {
+  margin-top: 6px;
+  font: 400 .75rem/1 var(--al-ui);
+  letter-spacing: var(--al-track);
+  color: var(--ivory-78, rgba(255, 244, 220, .74));
+  transition: color var(--dur-quick, .45s) var(--al-ease), transform .5s var(--ease-back, ease);
+}
+.act-laddoo .al-combo.is-hot { color: var(--al-gold); transform: translateY(-2px); }
+
+/* ---------- reaction caption ---------- */
+.act-laddoo .al-bubble {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  z-index: 2;
+  max-width: min(300px, 72%);
+  padding: 10px 18px 11px;
+  transform: translate(-50%, 8px);
+  background: rgba(8, 11, 30, .82);
+  color: var(--al-ivory);
+  border: var(--hair-w, 1px) solid var(--al-hair);
+  font-family: var(--al-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 19px;
+  line-height: 1.2;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .45s var(--al-ease), transform .6s var(--ease-out, ease);
+}
+.act-laddoo .al-bubble.is-on { opacity: 1; transform: translate(-50%, 0); }
+.act-laddoo .al-bubble.is-pop { animation: al-rise .6s var(--ease-out, ease); }
+.act-laddoo .al-bubble.is-bad { color: var(--al-saffron); border-color: rgba(255, 159, 50, .5); }
+.act-laddoo .al-bubble.is-gold { color: var(--al-gold); border-color: var(--al-gold); }
+@keyframes al-rise {
+  from { transform: translate(-50%, 10px); }
+  to { transform: translate(-50%, 0); }
+}
+
+/* ---------- screens ---------- */
+.act-laddoo .al-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  padding: 36px 16px 16px;
+  overflow: auto;
+  /* R4: a feathered pool of night behind the card, never a dark rectangle over the stall */
+  background: radial-gradient(ellipse 62% 66% at 50% 50%, rgba(5, 7, 15, .66), rgba(5, 7, 15, .38) 58%, rgba(5, 7, 15, 0) 100%);
+}
+.act-laddoo .al-screen[hidden] { display: none; }
+.act-laddoo .al-card {
+  position: relative;
+  width: min(520px, 100%);
+  padding: clamp(32px, 4vw, 48px) clamp(20px, 4vw, 44px) clamp(24px, 3vw, 34px);
+  text-align: center;
+  background: rgba(8, 11, 30, .72);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: var(--hair-w, 1px) solid var(--al-hair);
+}
+.act-laddoo .al-card::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: var(--hair-w, 1px) solid var(--al-hair-soft);
+  pointer-events: none;
+}
+.act-laddoo .al-card > * { position: relative; z-index: 1; }
+.act-laddoo .al-card--sm { width: min(400px, 100%); }
+.act-laddoo .al-kicker {
+  margin: 0 0 16px;
+  font: 400 .75rem/1.3 var(--al-ui);
+  letter-spacing: var(--al-track);
+  text-transform: uppercase;
+  color: var(--gold-text, rgba(255, 215, 120, .86));
+}
+.act-laddoo .al-title {
+  margin: 0 0 18px;
+  font-family: var(--al-display);
+  font-weight: 300;
+  font-size: clamp(30px, 3.6vw, 44px);
+  line-height: 1.02;
+  letter-spacing: -.01em;
+  color: var(--al-ivory);
+}
+.act-laddoo .al-title em { font-style: italic; font-weight: 300; color: var(--al-gold); }
+.act-laddoo .al-line {
+  margin: 0 auto 22px;
+  max-width: 34ch;
+  font-family: var(--al-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 19px;
+  color: var(--ivory-78, rgba(255, 244, 220, .78));
+}
+
+/* rate card: one fine row of sweets and their worth */
+.act-laddoo .al-rates {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(min-content, 1fr));
+  gap: 0 6px;
+  margin: 0 0 20px;
+  padding: 14px 0 12px;
+  list-style: none;
+  border-top: var(--hair-w, 1px) solid var(--al-hair-soft);
+  border-bottom: var(--hair-w, 1px) solid var(--al-hair-soft);
+}
+.act-laddoo .al-rates li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  text-align: center;
+}
+.act-laddoo .al-rates canvas { display: block; width: 36px; height: 36px; }
+.act-laddoo .al-rates b {
+  order: 2;
+  font-family: var(--al-display);
+  font-weight: 400;
+  font-size: 19px;
+  line-height: 1;
+  color: var(--al-ivory);
+  font-variant-numeric: lining-nums;
+  font-feature-settings: "lnum" 1;
+}
+.act-laddoo .al-rates span {
+  order: 3;
+  font: 400 .75rem/1.25 var(--al-ui);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ivory-78, rgba(255, 244, 220, .76));
+  hyphens: manual;
+}
+.act-laddoo .al-rates li.is-gold b { color: var(--al-gold); }
+.act-laddoo .al-rates li.is-bad b { color: var(--al-saffron); }
+.act-laddoo .al-controls {
+  margin: 0 0 22px;
+  font-size: .875rem;
+  line-height: 1.6;
+  color: var(--ivory-80, rgba(255, 244, 220, .8));
+}
+.act-laddoo kbd {
+  display: inline-block;
+  min-width: 20px;
+  padding: 0 5px;
+  font: 400 .75rem/1.5 var(--al-ui);
+  color: var(--al-ivory);
+  border: var(--hair-w, 1px) solid var(--al-hair);
+  background: transparent;
+}
+.act-laddoo .al-go { min-width: min(220px, 100%); max-width: 100%; white-space: normal; }
+.act-laddoo .al-best {
+  margin: 16px 0 0;
+  font: 400 .75rem/1 var(--al-ui);
+  letter-spacing: var(--al-track);
+  text-transform: uppercase;
+  color: var(--ivory-78, rgba(255, 244, 220, .74));
+}
+.act-laddoo .al-best b {
+  margin-left: 8px;
+  font-family: var(--al-display);
+  font-weight: 400;
+  font-size: 19px;
+  letter-spacing: 0;
+  color: var(--al-gold);
+  font-variant-numeric: lining-nums;
+  font-feature-settings: "lnum" 1;
+}
+
+.act-laddoo .al-countdown { background: radial-gradient(ellipse 40% 46% at 50% 50%, rgba(5, 7, 15, .5), rgba(5, 7, 15, 0) 100%); }
+.act-laddoo .al-countdown span {
+  font-family: var(--al-display);
+  font-weight: 300;
+  font-size: clamp(96px, 15vw, 170px);
+  line-height: 1;
+  color: var(--al-gold);
+  font-variant-numeric: lining-nums;
+  font-feature-settings: "lnum" 1;
+}
+.act-laddoo .al-countdown span.is-tick { animation: al-tick .6s var(--ease-out, ease); }
+@keyframes al-tick { from { transform: translateY(-10px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.act-laddoo .al-final { margin: 0 0 8px; line-height: 1; }
+.act-laddoo .al-final b {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--al-display);
+  font-weight: 300;
+  font-size: clamp(56px, 6.4vw, 80px);
+  color: var(--al-gold);
+  font-variant-numeric: lining-nums;
+  font-feature-settings: "lnum" 1;
+}
+.act-laddoo .al-final span { font: 400 .75rem/1 var(--al-ui); letter-spacing: var(--al-track); text-transform: uppercase; color: var(--ivory-78, rgba(255, 244, 220, .74)); }
+.act-laddoo .al-over { padding-top: 24px; }
+.act-laddoo .al-over .al-card { padding-top: clamp(24px, 3vw, 34px); padding-bottom: clamp(18px, 2.4vw, 26px); }
+.act-laddoo .al-over .al-kicker { margin-bottom: 8px; }
+.act-laddoo .al-over .al-title { margin-top: 12px; margin-bottom: 6px; }
+.act-laddoo .al-over .al-line { margin-bottom: 14px; }
+.act-laddoo .al-over .al-best { margin-top: 12px; }
+.act-laddoo [data-newbest] { color: var(--al-gold); }
+.act-laddoo .al-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0 0 18px;
+  padding: 10px 0 12px;
+  border-top: var(--hair-w, 1px) solid var(--al-hair-soft);
+  border-bottom: var(--hair-w, 1px) solid var(--al-hair-soft);
+}
+.act-laddoo .al-stats div { margin: 0; }
+.act-laddoo .al-stats dt { font: 400 .75rem/1.3 var(--al-ui); letter-spacing: .14em; text-transform: uppercase; color: var(--ivory-78, rgba(255, 244, 220, .74)); }
+.act-laddoo .al-stats dd { margin: 6px 0 0; font-family: var(--al-display); font-size: 26px; font-weight: 300; font-variant-numeric: lining-nums; font-feature-settings: "lnum" 1; }
+
+.act-laddoo .al-sr {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+@media (max-width: 640px) {
+  .act-laddoo { padding: 0 max(12px, env(safe-area-inset-right, 0px)) 0 max(12px, env(safe-area-inset-left, 0px)); }
+  .act-laddoo .al-arena { height: clamp(540px, 76vh, 660px); }
+  .act-laddoo .al-rates { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 14px; }
+  .act-laddoo .al-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 14px; }
+  .act-laddoo .al-hud { top: 34px; }
+  .act-laddoo .al-bubble { font-size: 17px; }
+  .act-laddoo .al-go { min-width: min(200px, 100%); letter-spacing: .2em; padding-inline: 1.4em; }
+}
+@media (max-width: 420px) {
+  .act-laddoo .al-controls { display: none; }
+  .act-laddoo .al-card { padding-inline: 16px; }
+}
+
+/* ---------- Revision 2: quiet how-to hint, pause control ---------- */
+.act-laddoo .act-hint {
+  margin: 0 auto 18px;
+  max-width: 62ch;
+  text-align: center;
+  font: 400 .8125rem/1.6 var(--al-ui);
+  letter-spacing: .06em;
+  color: var(--ivory-80, rgba(255, 244, 220, .8));
+  transition: opacity .9s var(--al-ease), visibility 0s linear .9s;
+}
+.act-laddoo .act-hint.is-gone { opacity: 0; visibility: hidden; }
+.act-laddoo .al-mid { display: flex; flex-direction: column; align-items: center; }
+.act-laddoo .al-pausebtn {
+  position: absolute;
+  z-index: 3;
+  top: 34px; left: 50%;
+  width: 44px; height: 44px;
+  margin-left: -22px;
+  display: none;
+  place-items: center;
+  padding: 0;
+  border: var(--hair-w, 1px) solid var(--al-hair);
+  border-radius: 50%;
+  background: rgba(8, 11, 30, .55);
+  color: var(--al-ivory);
+  cursor: pointer;
+  transition: border-color var(--dur-quick, .45s) var(--al-ease), color var(--dur-quick, .45s) var(--al-ease);
+}
+.act-laddoo .al-pausebtn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; }
+.act-laddoo .al-pausebtn:hover { border-color: var(--al-gold); color: var(--al-gold); }
+.act-laddoo.is-playing .al-pausebtn { display: grid; }
+.act-laddoo.is-playing .al-combo { margin-top: 56px; }
+.act-laddoo .al-pause-alt { margin: 12px 0 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .act-laddoo .act-hint { transition: none; }
+  .act-laddoo .al-bubble.is-pop,
+  .act-laddoo .al-countdown span.is-tick { animation: none; }
+  .act-laddoo .al-combo { transition: none; }
+}
+
+
+/* ==========================================================================
+   REVISION 6 — less "AI slop", more real Diwali
+   Mukta reads, Yatra One counts. HUD = brass tags with a kumkum dot; cards = puja-thali cards with a
+   marigold toran, a Devanagari stamp and a faint Warli dance; buttons are the shared festive set.
+   ========================================================================== */
+.act-laddoo { --al-warli: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 42' fill='none' stroke='%23FFD778' stroke-width='1.4' stroke-linejoin='round' stroke-linecap='round'%3E%3Ccircle cx='20' cy='7' r='3.2'/%3E%3Ccircle cx='60' cy='7' r='3.2'/%3E%3Ccircle cx='100' cy='7' r='3.2'/%3E%3Cpath d='M14 12h12l-6 10zM14 32h12l-6-10zM54 12h12l-6 10zM54 32h12l-6-10zM94 12h12l-6 10zM94 32h12l-6-10zM17 32l-2 8M23 32l2 8M57 32l-2 8M63 32l2 8M97 32l-2 8M103 32l2 8M26 13q17 9 34 0M66 13q17 9 34 0M14 13L6 19M106 13l8 6'/%3E%3C/svg%3E"); --al-ui: var(--font-body, "Mukta", system-ui, sans-serif); font-weight: 400; font-family: var(--al-ui); }
+.act-laddoo .act-hint { font: 400 var(--fs-hint)/1.6 var(--al-ui); letter-spacing: 0; max-width: 56ch; color: var(--ink); }
+
+/* HUD: brass tags, big Yatra One numerals */
+.act-laddoo .al-score, .act-laddoo .al-timer {
+  position: relative; gap: 6px; padding: 12px 20px 11px; min-width: 96px; align-items: center; text-align: center;
+  background: linear-gradient(180deg, rgba(14, 11, 38, .78), rgba(8, 11, 30, .66));
+  border: 1.5px solid rgba(217, 164, 65, .65); border-radius: 12px 12px 26px 26px;
+  box-shadow: inset 0 0 0 3px rgba(8, 11, 30, .8), inset 0 0 0 4px rgba(217, 164, 65, .25), 0 6px 16px rgba(0, 0, 0, .35);
+}
+.act-laddoo .al-score::before, .act-laddoo .al-timer::before { content: ""; position: absolute; left: 50%; top: -5px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: var(--kumkum); box-shadow: 0 0 0 1.5px var(--brass); }
+.act-laddoo .al-score span, .act-laddoo .al-timer span { font: 600 var(--fs-label)/1 var(--al-ui); letter-spacing: .02em; text-transform: none; color: var(--marigold-text); }
+.act-laddoo .al-score b, .act-laddoo .al-timer b { font: 400 clamp(1.9rem, 1.5rem + 1vw, 2.5rem)/1 var(--font-accent); color: var(--ivory); letter-spacing: .01em; }
+.act-laddoo .al-timer.is-hurry { border-color: var(--saffron); }
+.act-laddoo .al-timer.is-hurry b { color: #FFB452; }
+.act-laddoo .al-combo { font: 600 var(--fs-ui)/1 var(--al-ui); letter-spacing: .01em; text-transform: none; color: var(--ink); text-shadow: 0 1px 8px rgba(5, 7, 15, .9); }
+.act-laddoo .al-combo.is-hot { color: var(--marigold-text); }
+.act-laddoo .al-bubble { font: 400 var(--fs-md)/1.2 var(--font-accent); font-style: normal; padding: 11px 20px 12px; border-radius: 4px; background: rgba(8, 11, 30, .88); border: 1.5px solid rgba(217, 164, 65, .6); }
+.act-laddoo .al-bubble.is-bad { color: #FFB07A; }
+.act-laddoo .al-bubble.is-gold { color: var(--marigold-text); }
+/* pause = a small kumkum tilak */
+.act-laddoo .al-pausebtn { border: 0; background: radial-gradient(circle at 42% 36%, #E0283F, #A8122A 58%, #6E0A1B); box-shadow: inset 0 0 0 2px var(--brass), inset 0 0 0 3.5px rgba(80, 30, 4, .55), 0 4px 12px rgba(0, 0, 0, .45); color: var(--rice); }
+.act-laddoo .al-pausebtn::after { content: ""; position: absolute; left: 50%; top: 6px; width: 3px; height: 5px; margin-left: -1.5px; border-radius: 50%; background: var(--rice); }
+.act-laddoo .al-pausebtn svg { stroke-width: 2; }
+.act-laddoo .al-pausebtn:hover { border: 0; color: var(--rice); filter: brightness(1.12); box-shadow: inset 0 0 0 2px var(--brass-hi), inset 0 0 0 3.5px rgba(80, 30, 4, .55), 0 0 14px 2px rgba(240, 50, 74, .45); }
+
+/* the card: a thali card with a marigold toran across the top */
+.act-laddoo .al-card {
+  background: linear-gradient(180deg, rgba(16, 12, 42, .86), rgba(8, 11, 30, .82));
+  border: 0;
+  box-shadow: 0 0 0 1.5px rgba(217, 164, 65, .7), 0 0 0 5px rgba(8, 11, 30, .9), 0 0 0 6px rgba(217, 164, 65, .3), 0 24px 60px rgba(0, 0, 0, .45);
+  padding-top: clamp(40px, 5vw, 56px);
+}
+.act-laddoo .al-card::after { inset: 8px; border: 1px dotted rgba(255, 181, 46, .3); }
+.act-laddoo .al-card::before {
+  content: ""; position: absolute; left: 14px; right: 14px; top: -11px; height: 22px; z-index: 2; pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, #7A2E06 0 1.6px, var(--haldi) 2px 5.2px, var(--marigold-deep) 5.8px 8.6px, transparent 9px) 0 50% / 22px 22px repeat-x;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .55));
+}
+.act-laddoo .al-kicker { font: 400 var(--fs-eyebrow)/1.3 var(--font-accent); letter-spacing: .01em; text-transform: none; color: var(--marigold-text); margin-bottom: 14px; }
+.act-laddoo .al-title { font-weight: 400; font-size: clamp(2.1rem, 1.6rem + 2vw, 3.2rem); line-height: 1.04; }
+.act-laddoo .al-title em { font-weight: 400; color: var(--marigold-text); }
+.act-laddoo .al-line { font: 400 var(--fs-body)/1.6 var(--al-ui); font-style: normal; color: var(--ink); max-width: 32ch; }
+
+/* rates: each item sits in a little brass katori */
+.act-laddoo .al-rates { border: 0; padding: 16px 0 10px; margin-bottom: 18px; background: var(--al-rice, radial-gradient(circle, rgba(255, 248, 236, .6) 0 1.2px, transparent 1.7px)) 0 0 / 12px 6px repeat-x; position: relative; }
+.act-laddoo .al-rates::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: radial-gradient(circle, rgba(255, 248, 236, .6) 0 1.2px, transparent 1.7px) 0 0 / 12px 6px repeat-x; }
+.act-laddoo .al-rates li { gap: 6px; }
+.act-laddoo .al-rates li > canvas, .act-laddoo .al-rates .al-thumb { padding: 6px; border-radius: 50%; background: radial-gradient(circle at 40% 32%, rgba(255, 231, 163, .22), rgba(8, 11, 30, .7) 70%); box-shadow: inset 0 0 0 1.5px rgba(217, 164, 65, .7), 0 2px 5px rgba(0, 0, 0, .4); box-sizing: content-box; }
+.act-laddoo .al-rates b { font: 400 1.3rem/1 var(--font-accent); color: var(--ivory); }
+.act-laddoo .al-rates li.is-gold b { color: var(--marigold-text); }
+.act-laddoo .al-rates li.is-bad b { color: #FF9B7A; }
+.act-laddoo .al-rates span:not(.al-thumb) { font: 500 var(--fs-micro)/1.25 var(--al-ui); letter-spacing: 0; text-transform: none; color: var(--ink); }
+.act-laddoo .al-controls { font: 400 var(--fs-ui)/1.6 var(--al-ui); color: var(--ink); }
+.act-laddoo kbd { font: 600 var(--fs-micro)/1.5 var(--al-ui); min-width: 26px; text-align: center; padding: 0 7px; color: var(--ivory); border: 0; border-radius: 6px; background: linear-gradient(180deg, #3A2A18, #20150B); box-shadow: inset 0 0 0 1px rgba(217, 164, 65, .75), 0 2px 0 #090503; }
+.act-laddoo .al-go { min-width: min(260px, 100%); margin: 14px 8px 4px 0; }
+.act-laddoo .al-best { font: 500 var(--fs-ui)/1 var(--al-ui); letter-spacing: 0; text-transform: none; color: var(--ink); margin-top: 18px; }
+.act-laddoo .al-best b { font: 400 1.4rem/1 var(--font-accent); color: var(--marigold-text); margin-left: 8px; }
+.act-laddoo .al-final b { font: 400 clamp(3.4rem, 2.6rem + 3vw, 5.4rem)/1 var(--font-accent); color: var(--marigold-text); }
+.act-laddoo .al-final span { font: 600 var(--fs-ui)/1 var(--al-ui); letter-spacing: .02em; text-transform: none; color: var(--ink); }
+.act-laddoo .al-stats dt { font: 500 var(--fs-micro)/1.3 var(--al-ui); letter-spacing: 0; text-transform: none; color: var(--ink); }
+.act-laddoo .al-stats dd { font: 400 1.7rem/1 var(--font-accent); color: var(--ivory); margin-top: 8px; }
+.act-laddoo .al-stats { border-color: rgba(217, 164, 65, .3); }
+.act-laddoo [data-newbest] { color: var(--marigold-text); }
+.act-laddoo .al-stamp { position: absolute; top: 14px; right: 16px; transform: rotate(5deg); font-size: .98rem; z-index: 3; }
+.act-laddoo .al-warli { display: block; width: 130px; height: 46px; margin: 8px auto 0; opacity: .2; background: var(--al-warli) center / contain no-repeat; pointer-events: none; }
+.act-laddoo .al-pause-alt { margin: 8px 0 0; }
+.act-laddoo .al-countdown span, .act-laddoo .al-countdown { font-family: var(--font-accent); }
+.act-laddoo .al-countdown span { font-weight: 400; color: var(--marigold-text); }
+@media (max-width: 640px) {
+  .act-laddoo .al-go { letter-spacing: 0; padding-inline: 1.4em calc(1.4em + 22px); margin-right: 0; }
+  .act-laddoo .al-score, .act-laddoo .al-timer { min-width: 76px; padding: 10px 14px 9px; }
+  .act-laddoo .al-stamp { position: static; display: inline-flex; transform: none; margin-bottom: 10px; }
+  .act-laddoo .al-rates { padding-bottom: 14px; }
+}
+.act-laddoo [data-screen="start"] .al-warli { display: none; }
+.act-laddoo .al-title { font-size: clamp(2rem, 1.5rem + 1.8vw, 2.9rem); }
+.act-laddoo .al-card { padding-top: clamp(36px, 4vw, 48px); }

@@ -1,0 +1,349 @@
+/* ==========================================================================
+   Activity 06 — Spin the Chakri. Everything scoped under .act-chakri
+   Revision 1: the chakri and its sparks carry all the colour; the console is
+   a quiet gold-hairline instrument with light serif numerals.
+   ========================================================================== */
+.act-chakri {
+  --ck-navy: var(--navy, #080B1E);
+  --ck-saffron: var(--saffron, #FF9F32);
+  --ck-gold: var(--gold, #FFD778);
+  --ck-ivory: var(--ivory, #FFF4DC);
+  --ck-hair: var(--gold-hair, rgba(255, 215, 120, .34));
+  --ck-hair-soft: var(--gold-hair-soft, rgba(255, 215, 120, .18));
+  --ck-display: var(--font-display, "Cormorant Garamond", Georgia, serif);
+  --ck-ui: var(--font-body, "Mukta", system-ui, sans-serif);
+  --ck-track: var(--track-label, .28em);
+  --ck-ease: var(--ease-lux, cubic-bezier(.25, .1, .1, 1));
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
+  align-items: center;
+  gap: clamp(12px, 3vw, 48px);
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 max(var(--gutter, 20px), env(safe-area-inset-right, 0px)) 0 max(var(--gutter, 20px), env(safe-area-inset-left, 0px));
+  box-sizing: border-box;
+  color: var(--ck-ivory);
+  --ck-f: 0;
+  font-family: var(--ck-ui);
+  font-weight: 300;
+}
+.act-chakri *, .act-chakri *::before, .act-chakri *::after { box-sizing: border-box; }
+.act-chakri p { color: inherit; }
+
+/* ---------- the spark pit ---------- */
+.act-chakri .ck-pit {
+  position: relative;
+  height: clamp(360px, 62vh, 620px);
+  min-width: 0;
+  cursor: pointer;
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+/* the pit's light pool and sparks dissolve towards the canvas edges: no rectangular cut at any width */
+.act-chakri .ck-canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+  -webkit-mask-image: radial-gradient(closest-side at 50% 57%, #000 62%, rgba(0, 0, 0, .55) 82%, transparent 100%);
+  mask-image: radial-gradient(closest-side at 50% 57%, #000 62%, rgba(0, 0, 0, .55) 82%, transparent 100%);
+}
+
+/* the cue is still: a single hairline ellipse and a tracked caption */
+.act-chakri .ck-cue {
+  position: absolute;
+  left: 50%;
+  top: var(--ck-cue-y, 57%);
+  width: var(--ck-cue-size, 160px);
+  aspect-ratio: 1 / 0.42;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: opacity .9s var(--ck-ease);
+}
+.act-chakri.is-touched .ck-cue { opacity: 0; }
+.act-chakri .ck-cue-ring {
+  position: absolute; inset: -6%;
+  border: 1px solid rgba(255, 215, 120, .3);
+  border-radius: 50%;
+}
+.act-chakri .ck-cue-text {
+  position: absolute;
+  left: 50%; top: 100%;
+  transform: translate(-50%, 22px);
+  padding-left: .28em;
+  white-space: nowrap;
+  font: 400 .75rem/1 var(--ck-ui);
+  letter-spacing: var(--ck-track);
+  text-transform: uppercase;
+  color: var(--ivory-80, rgba(255, 244, 220, .8));
+}
+
+/* ---------- console (gauge + controls) ---------- */
+.act-chakri .ck-console {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 0;
+  padding: clamp(24px, 3vw, 40px) clamp(16px, 2.4vw, 32px);
+  border: var(--hair-w, 1px) solid var(--ck-hair-soft);
+  isolation: isolate;
+}
+/* light spill: the spinning chakri warms the console's hairline and throws a faint glow onto it (R3: opacity-only
+   layers, so the per-frame --ck-f never repaints a blurred shadow) */
+.act-chakri .ck-console::after {
+  content: ""; position: absolute; inset: -1px; z-index: -1; pointer-events: none;
+  border: var(--hair-w, 1px) solid rgba(255, 215, 120, .58);
+  box-shadow: inset 0 0 60px rgba(255, 159, 50, .1), 0 0 46px rgba(255, 159, 50, .1);
+  opacity: var(--ck-f); will-change: opacity;
+}
+.act-chakri .ck-gauge { position: relative; width: min(100%, 320px); }
+.act-chakri .ck-gauge-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.act-chakri .ck-arc-outer { fill: none; stroke: rgba(255, 215, 120, .22); stroke-width: 1; }
+.act-chakri .ck-petal { fill: var(--ck-gold); opacity: .4; }
+.act-chakri .ck-arc-track { fill: none; stroke: rgba(255, 215, 120, .14); stroke-width: 2; }
+.act-chakri .ck-arc-fill { fill: none; stroke: url(#ckGaugeGrad); stroke-width: 2; }
+.act-chakri .ck-tick { stroke: rgba(255, 244, 220, .22); stroke-width: 1; }
+.act-chakri .ck-tick--major { stroke: rgba(255, 215, 120, .7); stroke-width: 1; }
+.act-chakri .ck-end {
+  fill: rgba(255, 244, 220, .78);
+  font: 400 14px var(--ck-ui);
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+.act-chakri .ck-needle-flame { fill: url(#ckNeedleGlow); }
+/* R3: a stroked halo instead of a drop-shadow filter — the needle moves every frame, a filter would re-blur each time */
+.act-chakri .ck-needle-halo { fill: rgba(255, 159, 50, .16); stroke: rgba(255, 159, 50, .22); stroke-width: 7; stroke-linejoin: round; }
+.act-chakri .ck-needle-core { fill: var(--ck-ivory); opacity: .85; }
+.act-chakri .ck-diya { fill: #6E2F17; stroke: rgba(255, 215, 120, .6); stroke-width: 1; }
+.act-chakri .ck-diya-rim { fill: none; stroke: rgba(255, 215, 120, .7); stroke-width: 1; }
+.act-chakri .ck-diya-dot { fill: rgba(255, 244, 220, .6); }
+
+.act-chakri .ck-readout {
+  margin: -4px 0 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: .5em;
+  line-height: 1;
+}
+.act-chakri .ck-rpm {
+  font-family: var(--ck-display);
+  font-weight: 300;
+  font-size: clamp(2.8rem, 5vw, 3.8rem);
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "lnum" 1, "tnum" 1;
+  color: var(--ck-ivory);
+  min-width: 4ch;
+  text-align: right;
+}
+.act-chakri .ck-unit { font: 400 .75rem/1 var(--ck-ui); letter-spacing: var(--ck-track); color: var(--gold-text, rgba(255, 215, 120, .86)); }
+
+.act-chakri .ck-name {
+  margin: 18px 0 0;
+  font-family: var(--ck-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.45rem, 2.2vw, 1.85rem);
+  line-height: 1.15;
+  color: var(--ck-gold);
+  min-height: 2.3em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-wrap: balance;
+}
+.act-chakri[data-tier="8"] .ck-name {
+  font-style: normal;
+  letter-spacing: .04em;
+  color: var(--ck-ivory);
+  text-shadow: 0 0 22px rgba(255, 215, 120, .45);
+}
+.act-chakri .ck-aside { margin: 4px 0 0; font-size: .95rem; line-height: 1.6; color: var(--ivory-80, rgba(255, 244, 220, .8)); min-height: 3.2em; max-width: 30ch; }
+
+.act-chakri .ck-combo {
+  margin: 14px 0 20px;
+  font: 400 .75rem/1 var(--ck-ui);
+  letter-spacing: var(--ck-track);
+  text-transform: uppercase;
+  color: var(--ivory-78, rgba(255, 244, 220, .76));
+}
+.act-chakri .ck-combo-v {
+  display: inline-block;
+  min-width: 3.4ch;
+  margin-left: .4em;
+  font: 300 1rem/1 var(--ck-display);
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "lnum" 1, "tnum" 1;
+  color: var(--ck-ivory);
+  transition: color var(--dur-quick, .45s) var(--ck-ease), transform .45s var(--ease-back, ease);
+}
+.act-chakri .ck-combo.is-hot .ck-combo-v { color: var(--ck-gold); transform: translateY(-2px); }
+
+/* ---------- the hold button (the one gold action) ---------- */
+.act-chakri .ck-hold {
+  min-width: 230px;
+  min-height: 56px;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.act-chakri .ck-help { margin: 14px 0 0; font-size: .875rem; line-height: 1.6; color: var(--ivory-80, rgba(255, 244, 220, .8)); max-width: 30ch; }
+
+.act-chakri .ck-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  width: min(100%, 320px);
+  margin: 26px 0 0;
+  border-top: var(--hair-w, 1px) solid var(--ck-hair-soft);
+}
+.act-chakri .ck-stats > div { padding: 14px 8px 0; }
+.act-chakri .ck-stats > div + div { border-left: var(--hair-w, 1px) solid var(--ck-hair-soft); }
+.act-chakri .ck-stats dt { font: 400 .75rem/1.3 var(--ck-ui); letter-spacing: .14em; text-transform: uppercase; color: var(--ivory-78, rgba(255, 244, 220, .76)); }
+.act-chakri .ck-stats dd {
+  margin: 6px 0 0;
+  font-family: var(--ck-display);
+  font-weight: 300;
+  font-size: 1.55rem;
+  color: var(--ck-gold);
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "lnum" 1, "tnum" 1;
+}
+.act-chakri .ck-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; }
+
+.act-chakri.is-burst .ck-gauge { animation: ck-jolt .7s var(--ease-out, ease); }
+/* R4: the needle-slam jolt is a short translate knock, never a zoom */
+@keyframes ck-jolt {
+  0% { transform: none; }
+  18% { transform: translateY(3px); }
+  42% { transform: translateY(-2px); }
+  70% { transform: translateY(1px); }
+  100% { transform: none; }
+}
+
+.act-chakri.is-paused *, .act-chakri.is-paused *::before, .act-chakri.is-paused *::after { animation-play-state: paused !important; }
+
+/* ---------- Revision 3: the screen-wide spin ---------- */
+/* the full-screen light and sparks run BEHIND the console (E2M.screenLayer 'back'); the console's plate darkens with
+   the speed so the gauge, labels and button keep their contrast over the brightest light */
+.act-chakri .ck-console::before {
+  content: ""; position: absolute; inset: 0; z-index: -2; pointer-events: none;
+  background: rgba(5, 7, 15, .9);
+  opacity: calc(.2 + var(--ck-f) * .8); will-change: opacity;
+}
+.act-chakri .ck-pit > .act-hint, .act-chakri > .act-hint { position: relative; }
+
+/* R3.7 idle life: the unlit fuse smoulders. A breathing ember and four motes that rise, drift and wink out.
+   CSS only (compositor transforms/opacity), hidden while spinning, frozen in Calm, Pause and offscreen. */
+.act-chakri .ck-embers {
+  position: absolute; left: 50%; top: 57%; width: 0; height: 0; pointer-events: none;
+  transition: opacity .6s var(--ck-ease);
+}
+.act-chakri.is-spinning .ck-embers { opacity: 0; transition-duration: .15s; }
+.act-chakri .ck-embers b {
+  position: absolute; left: -14px; top: -14px; width: 28px; height: 28px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 244, 220, .95) 0 8%, rgba(255, 180, 80, .55) 22%, rgba(232, 100, 26, .18) 50%, transparent 72%);
+  animation: ck-smoulder 2.9s ease-in-out infinite;
+}
+.act-chakri .ck-embers i {
+  position: absolute; left: -1.5px; top: -1.5px; width: 3px; height: 3px; border-radius: 50%;
+  background: #FFD778; box-shadow: 0 0 6px 1px rgba(255, 159, 50, .75);
+  opacity: 0; animation: ck-mote 3.6s cubic-bezier(.3, .1, .4, 1) infinite;
+}
+.act-chakri .ck-embers i:nth-child(3) { animation-delay: .9s; animation-duration: 4.2s; --dx: -14px; }
+.act-chakri .ck-embers i:nth-child(4) { animation-delay: 1.9s; animation-duration: 3.3s; --dx: 9px; background: #FFF4DC; }
+.act-chakri .ck-embers i:nth-child(5) { animation-delay: 2.7s; animation-duration: 4.6s; --dx: -5px; background: #FF9F32; }
+@keyframes ck-smoulder {
+  0%, 100% { transform: scale(.82); opacity: .55; }
+  38% { transform: scale(1.06); opacity: .95; }
+  55% { transform: scale(.92); opacity: .7; }
+  70% { transform: scale(1); opacity: .85; }
+}
+@keyframes ck-mote {
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  12% { opacity: .95; }
+  60% { opacity: .55; }
+  100% { transform: translate(var(--dx, 6px), -64px) scale(.4); opacity: 0; }
+}
+html.is-calm .act-chakri .ck-embers i, html.is-paused .act-chakri .ck-embers i { display: none; }
+html.is-calm .act-chakri .ck-embers b, html.is-paused .act-chakri .ck-embers b { animation: none; opacity: .7; }
+
+/* ---------- responsive ---------- */
+/* ---------- Revision 2: quiet how-to hint, focus ---------- */
+.act-chakri .act-hint {
+  grid-column: 1 / -1;
+  margin: 0 auto 4px;
+  max-width: 62ch;
+  text-align: center;
+  font: 400 .8125rem/1.6 var(--ck-ui);
+  letter-spacing: .06em;
+  color: var(--ivory-80, rgba(255, 244, 220, .8));
+  transition: opacity .9s var(--ck-ease), visibility 0s linear .9s;
+}
+.act-chakri .act-hint.is-gone { opacity: 0; visibility: hidden; }
+.act-chakri button:focus-visible { outline: var(--focus-ring, 2px solid #FFD778); outline-offset: 3px; }
+
+@media (max-width: 860px) {
+  .act-chakri { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 0 max(12px, env(safe-area-inset-right, 0px)) 0 max(12px, env(safe-area-inset-left, 0px)); }
+  .act-chakri .ck-pit { height: clamp(300px, 50vh, 420px); }
+  .act-chakri .ck-console { margin-top: -10px; border-left: 0; border-right: 0; border-bottom: 0; }
+  .act-chakri .ck-gauge { width: min(100%, 280px); }
+  /* the console fills most of a phone screen: a lighter plate lets the full-screen light read through it */
+  .act-chakri .ck-console::before { opacity: calc(.12 + var(--ck-f) * .6); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .act-chakri .act-hint { transition: none; }
+  .act-chakri.is-burst .ck-gauge { animation: none; }
+  .act-chakri .ck-combo-v { transition: none; }
+  .act-chakri .ck-embers i { display: none; }
+  .act-chakri .ck-embers b { animation: none; opacity: .7; }
+}
+
+
+/* ==========================================================================
+   REVISION 6 — less "AI slop", more real Diwali
+   The console is a brass-edged thali card under a marigold toran, stamped "चकरी"; Yatra One numerals,
+   Mukta readouts in sentence case, a diya for the hold button that LIGHTS while you hold.
+   ========================================================================== */
+.act-chakri { --ck-warli: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 42' fill='none' stroke='%23FFD778' stroke-width='1.4' stroke-linejoin='round' stroke-linecap='round'%3E%3Ccircle cx='20' cy='7' r='3.2'/%3E%3Ccircle cx='60' cy='7' r='3.2'/%3E%3Ccircle cx='100' cy='7' r='3.2'/%3E%3Cpath d='M14 12h12l-6 10zM14 32h12l-6-10zM54 12h12l-6 10zM54 32h12l-6-10zM94 12h12l-6 10zM94 32h12l-6-10zM17 32l-2 8M23 32l2 8M57 32l-2 8M63 32l2 8M97 32l-2 8M103 32l2 8M26 13q17 9 34 0M66 13q17 9 34 0M14 13L6 19M106 13l8 6'/%3E%3C/svg%3E"); --ck-ui: var(--font-body, "Mukta", system-ui, sans-serif); font-weight: 400; }
+.act-chakri .act-hint { font: 400 var(--fs-hint)/1.6 var(--ck-ui); letter-spacing: 0; max-width: 56ch; color: var(--ink); }
+.act-chakri .ck-cue-text { font: 600 var(--fs-ui)/1 var(--ck-ui); letter-spacing: .01em; text-transform: none; padding-left: 0; color: var(--ink); text-shadow: 0 1px 8px rgba(5, 7, 15, .95); }
+.act-chakri .ck-console {
+  border: 0;
+  box-shadow: 0 0 0 1.5px rgba(217, 164, 65, .7), 0 0 0 5px rgba(8, 11, 30, .9), 0 0 0 6px rgba(217, 164, 65, .3);
+  padding-top: clamp(40px, 4vw, 52px);
+}
+.act-chakri .ck-console::after { border: 0; inset: 0; box-shadow: inset 0 0 0 1.5px rgba(255, 215, 120, .75), inset 0 0 60px rgba(255, 159, 50, .1), 0 0 46px rgba(255, 159, 50, .14); }
+.act-chakri .ck-toran { position: absolute; left: 14px; right: 14px; top: -11px; height: 22px; pointer-events: none; z-index: 1;
+  background: radial-gradient(circle at 50% 50%, #7A2E06 0 1.6px, var(--haldi) 2px 5.2px, var(--marigold-deep) 5.8px 8.6px, transparent 9px) 0 50% / 22px 22px repeat-x;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .55)); }
+.act-chakri .ck-stamp { position: absolute; top: 18px; right: 16px; transform: rotate(5deg); font-size: .98rem; }
+.act-chakri .ck-end { font: 600 15px var(--ck-ui); letter-spacing: .02em; text-transform: none; fill: rgba(255, 244, 220, .92); }
+.act-chakri .ck-rpm { font: 400 clamp(3.2rem, 2.4rem + 3vw, 4.6rem)/1 var(--font-accent); color: var(--ivory); letter-spacing: .01em; }
+.act-chakri .ck-unit { font: 600 var(--fs-ui)/1 var(--ck-ui); letter-spacing: .06em; color: var(--marigold-text); }
+.act-chakri .ck-name { font-weight: 400; font-size: clamp(1.7rem, 1.3rem + 1.4vw, 2.2rem); color: var(--marigold-text); }
+.act-chakri[data-tier="8"] .ck-name { letter-spacing: .02em; color: var(--ivory); }
+.act-chakri .ck-aside { font: 400 var(--fs-body)/1.5 var(--ck-ui); color: var(--ink); max-width: 28ch; min-height: 3.1em; }
+.act-chakri .ck-combo { font: 600 var(--fs-ui)/1 var(--ck-ui); letter-spacing: .01em; text-transform: none; color: var(--ink); margin: 14px 0 28px; }
+.act-chakri .ck-combo-v { font: 400 1.4rem/1 var(--font-accent); color: var(--ivory); }
+.act-chakri .ck-combo.is-hot .ck-combo-v { color: var(--marigold-text); }
+.act-chakri .ck-hold { min-width: 0; width: calc(100% - 28px); max-width: 300px; }
+.act-chakri .ck-hold-label { font-size: 1.25rem; }
+.act-chakri.is-holding .ck-hold { --lit: 1; }
+.act-chakri .ck-help { font: 400 var(--fs-ui)/1.55 var(--ck-ui); color: var(--ink); max-width: 30ch; margin-top: 16px; }
+.act-chakri .ck-stats { border-top: 0; background: radial-gradient(circle, rgba(255, 248, 236, .6) 0 1.2px, transparent 1.7px) 0 0 / 12px 6px repeat-x; }
+.act-chakri .ck-stats > div { padding-top: 18px; }
+.act-chakri .ck-stats > div + div { border-left-color: rgba(217, 164, 65, .35); }
+.act-chakri .ck-stats dt { font: 500 var(--fs-micro)/1.3 var(--ck-ui); letter-spacing: 0; text-transform: none; color: var(--ink); }
+.act-chakri .ck-stats dd { font: 400 1.7rem/1 var(--font-accent); color: var(--marigold-text); margin-top: 8px; }
+.act-chakri .ck-warli { display: block; width: 130px; height: 46px; margin: 18px auto 0; opacity: .16; background: var(--ck-warli) center / contain no-repeat; pointer-events: none; }
+@media (max-width: 860px) { .act-chakri .ck-console { margin-top: 6px; } .act-chakri .ck-console { border: 0; } }
